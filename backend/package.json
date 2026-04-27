@@ -1,0 +1,31 @@
+{
+  "name": "wedcard-backend",
+  "version": "1.0.0",
+  "description": "WedCard Pro Backend API",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "mkdir dist && copy src\\*.js dist\\",
+    "start": "node dist/server.js",
+    "dev": "nodemon src/server.js",
+    "clean": "rmdir /s /q dist"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.1.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "nodemailer": "^6.9.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.6.0",
+    "nodemon": "^3.0.1",
+    "typescript": "^6.0.3"
+  }
+}
