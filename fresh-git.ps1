@@ -1,78 +1,51 @@
-# fresh-git.ps1
+# final-push.ps1
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "   Fresh Git Setup - WedCard Pro" -ForegroundColor Cyan
+Write-Host "   Final Push to GitHub" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 Set-Location "E:\Project Code\wedcard-pro"
 
-Write-Host "[1/8] Removing old .git folder..." -ForegroundColor Yellow
-Remove-Item -Path ".git" -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host "OK" -ForegroundColor Green
+Write-Host "IMPORTANT: First create repository on GitHub!" -ForegroundColor Yellow
+Write-Host "1. Go to: https://github.com/new" -ForegroundColor Cyan
+Write-Host "2. Repository name: wedcard-pro" -ForegroundColor Cyan
+Write-Host "3. Click 'Create repository'" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "[2/8] Initializing fresh git repository..." -ForegroundColor Yellow
-git init
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[3/8] Setting user identity..." -ForegroundColor Yellow
-git config user.name "ta474314"
-git config user.email "ta474314@gmail.com"
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[4/8] Creating .gitignore..." -ForegroundColor Yellow
-@"
-node_modules/
-dist/
-build/
-.env
-.env.local
-.env.production
-.DS_Store
-*.log
-.vscode/
-.idea/
-backend/node_modules/
-frontend/node_modules/
-backend/dist/
-frontend/dist/
-"@ | Out-File -FilePath ".gitignore" -Encoding utf8
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[5/8] Adding files..." -ForegroundColor Yellow
-git add .
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[6/8] Committing files..." -ForegroundColor Yellow
-git commit -m "Initial commit: WedCard Pro application"
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[7/8] Adding remote repository..." -ForegroundColor Yellow
-git remote add origin https://github.com/ta474314/wedcard-pro.git
-Write-Host "OK" -ForegroundColor Green
-Write-Host ""
-
-Write-Host "[8/8] Pushing to GitHub..." -ForegroundColor Yellow
-Write-Host ""
-Write-Host "IMPORTANT: When prompted for password, use your Personal Access Token" -ForegroundColor Red
-Write-Host "Get token from: https://github.com/settings/tokens" -ForegroundColor Red
-Write-Host ""
-git push -u origin master
+$confirm = Read-Host "Have you created the repository? (yes/no)"
+if ($confirm -ne "yes") {
+    Write-Host "Please create the repository first, then run this script again." -ForegroundColor Red
+    exit
+}
 
 Write-Host ""
+Write-Host "Enter your GitHub Personal Access Token" -ForegroundColor Yellow
+Write-Host "Get token from: https://github.com/settings/tokens/new" -ForegroundColor Cyan
+Write-Host "Select ALL 'repo' scopes" -ForegroundColor Cyan
+Write-Host ""
+
+$token = Read-Host "Paste your token here" -AsSecureString
+$BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($token)
+$plainToken = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+
+Write-Host ""
+Write-Host "Pushing to GitHub..." -ForegroundColor Green
+
+# Try pushing
+git push https://ta474314:$plainToken@github.com/ta474314/wedcard-pro.git master --force
+
 if ($LASTEXITCODE -eq 0) {
+    Write-Host ""
     Write-Host "========================================" -ForegroundColor Green
-    Write-Host "   ✅ SUCCESS! Code pushed to GitHub" -ForegroundColor Green
+    Write-Host "   ✅ SUCCESS!" -ForegroundColor Green
     Write-Host "   https://github.com/ta474314/wedcard-pro" -ForegroundColor Green
     Write-Host "========================================" -ForegroundColor Green
 } else {
-    Write-Host "========================================" -ForegroundColor Red
-    Write-Host "   ❌ FAILED. Trying with main branch..." -ForegroundColor Red
-    Write-Host "========================================" -ForegroundColor Red
-    git push -u origin main
+    Write-Host ""
+    Write-Host "Trying to set remote first..." -ForegroundColor Yellow
+    git remote remove origin
+    git remote add origin https://github.com/ta474314/wedcard-pro.git
+    git push https://ta474314:$plainToken@github.com/ta474314/wedcard-pro.git master --force
 }
+
+[System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
