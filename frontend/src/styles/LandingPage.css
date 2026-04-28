@@ -435,13 +435,22 @@ body.sidebar-open {
   100% { background-position: 200% 0; }
 }
 
-/* Navigation Container */
+/* Navigation Container - Fixed for Android */
 .mobile-nav-container-premium {
-  flex: 0.7;
+  flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   position: relative;
+  min-height: 0;
+  max-height: 100%;
+}
+/* Mobile Sidebar Content Wrapper - Ensures footer is always visible */
+.mobile-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .mobile-nav-container-premium::-webkit-scrollbar {
@@ -548,6 +557,7 @@ body.sidebar-open {
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   padding: 1rem 1.2rem 1.5rem;
   flex-shrink: 0;
+  margin-top: auto;
 }
 
 .footer-divider {
@@ -1769,11 +1779,26 @@ body.sidebar-open {
     gap: 0.5rem;
   }
   
-  /* Mobile sidebar adjustments */
-  .mobile-sidebar {
-    width: 85%;
-    max-width: 320px;
-  }
+ /* Sidebar Container - Fixed for Android */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 85%;
+  max-width: 340px;
+  height: 100vh;
+  background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
+  z-index: 2000;
+  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.mobile-sidebar.open {
+  right: 0;
+}
   
   .avatar-premium {
     width: 50px;
