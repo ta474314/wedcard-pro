@@ -1642,9 +1642,7 @@ body.sidebar-open {
     -webkit-overflow-scrolling: touch;
   }
   
-  .mobile-footer-premium {
-    padding-bottom: env(safe-area-inset-bottom, 1.5rem);
-  }
+
 }
 /* Mobile Specific Styles */
 @media (max-width: 768px) {
