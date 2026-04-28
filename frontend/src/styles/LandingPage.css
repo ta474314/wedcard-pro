@@ -546,7 +546,6 @@ body.sidebar-open {
 .mobile-footer-premium {
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 1rem 1rem 1rem;
   flex-shrink: 0;
 }
 
