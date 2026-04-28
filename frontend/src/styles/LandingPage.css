@@ -542,11 +542,10 @@ body.sidebar-open {
   animation: pulseDot 2s infinite;
 }
 
-/* Premium Footer */
 .mobile-footer-premium {
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0.5rem 0.2rem 0.5rem;
+  padding: 0.3rem 1.2rem 1.5rem; /* top padding reduce */
   flex-shrink: 0;
 }
 
