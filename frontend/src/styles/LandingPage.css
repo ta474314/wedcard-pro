@@ -550,11 +550,7 @@ body.sidebar-open {
   flex-shrink: 0;
 }
 
-.footer-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
-  margin-bottom: 1rem;
-}
+
 
 .action-buttons-premium {
   display: flex;
