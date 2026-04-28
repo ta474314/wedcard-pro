@@ -437,7 +437,7 @@ body.sidebar-open {
 
 /* Navigation Container */
 .mobile-nav-container-premium {
-  flex: 1;
+  flex: 0.7;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 1rem 0;
@@ -546,7 +546,7 @@ body.sidebar-open {
 .mobile-footer-premium {
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: 0;
+  padding: 1rem 1.2rem 1.5rem;
   flex-shrink: 0;
 }
 
