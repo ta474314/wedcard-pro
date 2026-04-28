@@ -10,7 +10,8 @@ import {
   FaBars, FaTimes, FaVideo, FaHeadset,
   FaRobot, FaWhatsapp, FaApple, FaGoogle,
   FaGlobe, FaPoll, FaCcVisa, FaCcMastercard, FaCcPaypal, FaRupeeSign,
-  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt
+  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt,
+  FaGift
 } from 'react-icons/fa';
 import '../styles/globals.css';
 import '../styles/animations.css';
@@ -50,16 +51,25 @@ const LandingPage = () => {
     return testimonials.slice(start, start + itemsPerPage);
   };
 
+  // Get user first name
+  const getUserFirstName = () => {
+    if (!user?.name) return null;
+    return user.name.split(' ')[0];
+  };
+
   // Handle body scroll when sidebar is open
   useEffect(() => {
     if (mobileMenuOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('sidebar-open');
     } else {
       document.body.style.overflow = 'unset';
+      document.body.classList.remove('sidebar-open');
     }
     
     return () => {
       document.body.style.overflow = 'unset';
+      document.body.classList.remove('sidebar-open');
     };
   }, [mobileMenuOpen]);
 
@@ -182,64 +192,119 @@ const LandingPage = () => {
         <div className="grid-pattern"></div>
       </div>
 
-      {/* Mobile Sidebar - Only visible on mobile */}
+      {/* ==================== PREMIUM MOBILE SIDEBAR ==================== */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="mobile-sidebar-header">
-          <div className="mobile-logo">
-            <FaHeart className="mobile-logo-icon" />
-            <span>Wed<span className="text-gold">Card</span> Pro</span>
+        {/* Premium Header with Gradient */}
+        <div className="mobile-sidebar-header-premium">
+          <div className="header-glow"></div>
+          <div className="header-content-premium">
+            <div className="user-profile-premium">
+              <div className="avatar-ring-premium">
+                <div className="avatar-premium">
+                  {user ? (
+                    <span className="avatar-text-premium">{getUserFirstName()?.charAt(0) || 'U'}</span>
+                  ) : (
+                    <FaUser />
+                  )}
+                </div>
+                <div className="status-dot-premium"></div>
+              </div>
+              <div className="user-greeting-premium">
+                {user ? (
+                  <>
+                    <span className="greeting-premium">Welcome back,</span>
+                    <span className="username-premium">{getUserFirstName() || 'User'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="greeting-premium">Welcome to</span>
+                    <span className="brand-premium">Wed<span className="gold-premium">Card</span> Pro</span>
+                  </>
+                )}
+              </div>
+            </div>
+            <button className="close-btn-premium" onClick={() => setMobileMenuOpen(false)}>
+              <FaTimes />
+            </button>
           </div>
-          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
-            <FaTimes />
-          </button>
+          <div className="header-decoration">
+            <div className="decoration-line"></div>
+          </div>
         </div>
-        
-        <div className="mobile-user-info">
-          <div className="mobile-avatar">
-            <FaUser />
-          </div>
-          <div className="mobile-welcome">
-            {user ? <span>Welcome back!</span> : <span>Welcome to WedCard Pro</span>}
-          </div>
-        </div>
-        
-        {/* Scrollable Navigation */}
-        <div className="mobile-nav-scrollable">
-          <nav className="mobile-nav">
-            <a onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>
-              <FaHeart /> Home
+
+        {/* Premium Navigation */}
+        <div className="mobile-nav-container-premium">
+          <nav className="mobile-nav-premium">
+            <a onClick={() => scrollToSection('home')} className={`nav-link-premium ${activeSection === 'home' ? 'active' : ''}`}>
+              <div className="nav-icon-premium">
+                <FaHeart />
+              </div>
+              <span className="nav-text-premium">Home</span>
+              {activeSection === 'home' && <div className="nav-active-dot"></div>}
             </a>
-            <a onClick={() => scrollToSection('features')} className={activeSection === 'features' ? 'active' : ''}>
-              <FaStar /> Features
+            <a onClick={() => scrollToSection('features')} className={`nav-link-premium ${activeSection === 'features' ? 'active' : ''}`}>
+              <div className="nav-icon-premium">
+                <FaStar />
+              </div>
+              <span className="nav-text-premium">Features</span>
+              {activeSection === 'features' && <div className="nav-active-dot"></div>}
             </a>
-            <a onClick={() => scrollToSection('templates')} className={activeSection === 'templates' ? 'active' : ''}>
-              <FaImages /> Templates
+            <a onClick={() => scrollToSection('templates')} className={`nav-link-premium ${activeSection === 'templates' ? 'active' : ''}`}>
+              <div className="nav-icon-premium">
+                <FaImages />
+              </div>
+              <span className="nav-text-premium">Templates</span>
+              {activeSection === 'templates' && <div className="nav-active-dot"></div>}
             </a>
-            <a onClick={() => scrollToSection('pricing')} className={activeSection === 'pricing' ? 'active' : ''}>
-              <FaRupeeSign /> Pricing
+            <a onClick={() => scrollToSection('pricing')} className={`nav-link-premium ${activeSection === 'pricing' ? 'active' : ''}`}>
+              <div className="nav-icon-premium">
+                <FaRupeeSign />
+              </div>
+              <span className="nav-text-premium">Pricing</span>
+              {activeSection === 'pricing' && <div className="nav-active-dot"></div>}
             </a>
-            <a onClick={() => scrollToSection('testimonials')} className={activeSection === 'testimonials' ? 'active' : ''}>
-              <FaUsers /> Testimonials
+            <a onClick={() => scrollToSection('testimonials')} className={`nav-link-premium ${activeSection === 'testimonials' ? 'active' : ''}`}>
+              <div className="nav-icon-premium">
+                <FaUsers />
+              </div>
+              <span className="nav-text-premium">Testimonials</span>
+              {activeSection === 'testimonials' && <div className="nav-active-dot"></div>}
             </a>
           </nav>
         </div>
-        
-        <div className="mobile-sidebar-footer">
-          {user ? (
-            <Link to="/dashboard" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
-              <FaHeart /> Dashboard
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" className="mobile-btn-outline" onClick={() => setMobileMenuOpen(false)}>
-                <FaSignInAlt /> Sign In
+
+        {/* Premium Footer Actions */}
+        <div className="mobile-footer-premium">
+          <div className="footer-divider"></div>
+          <div className="action-buttons-premium">
+            {user ? (
+              <Link to="/dashboard" className="action-btn-premium dashboard-btn" onClick={() => setMobileMenuOpen(false)}>
+                <FaHeart />
+                <span>Dashboard</span>
+                <FaArrowRight className="btn-arrow" />
               </Link>
-              <Link to="/login" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
-                Get Started <FaArrowRight />
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link to="/login" className="action-btn-premium signin-btn" onClick={() => setMobileMenuOpen(false)}>
+                  <FaSignInAlt />
+                  <span>Sign In</span>
+                </Link>
+                <Link to="/login" className="action-btn-premium getstarted-btn" onClick={() => setMobileMenuOpen(false)}>
+                  <FaGift />
+                  <span>Get Started Free</span>
+                  <FaArrowRight className="btn-arrow" />
+                </Link>
+              </>
+            )}
+          </div>
+          <div className="footer-branding">
+            <div className="branding-text">
+              <FaHeart className="branding-icon" />
+              <span>WedCard Pro</span>
+            </div>
+            <p className="version-text">v1.0.0</p>
+          </div>
         </div>
       </div>
 
@@ -254,7 +319,6 @@ const LandingPage = () => {
             <span className="logo-badge">Premium</span>
           </div>
           
-          {/* Desktop Menu - Visible only on desktop */}
           <div className="nav-menu">
             <a className={`nav-link ${activeSection === 'home' ? 'active' : ''}`} onClick={() => scrollToSection('home')}>Home</a>
             <a className={`nav-link ${activeSection === 'features' ? 'active' : ''}`} onClick={() => scrollToSection('features')}>Features</a>
@@ -263,7 +327,6 @@ const LandingPage = () => {
             <a className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`} onClick={() => scrollToSection('testimonials')}>Testimonials</a>
           </div>
           
-          {/* Desktop Buttons - Visible only on desktop */}
           <div className="nav-buttons desktop-only">
             {user ? (
               <Link to="/dashboard" className="btn-premium-glow">
@@ -281,7 +344,6 @@ const LandingPage = () => {
             )}
           </div>
           
-          {/* Mobile Menu Button - Visible only on mobile */}
           <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
             <FaBars />
           </button>
