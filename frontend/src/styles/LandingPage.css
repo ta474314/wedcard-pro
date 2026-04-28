@@ -234,7 +234,7 @@
   color: #FFD700;
 }
 
-/* ==================== PREMIUM MOBILE SIDEBAR ==================== */
+/* ==================== PREMIUM MOBILE SIDEBAR - FIXED BOTTOM BUTTONS ==================== */
 
 /* Mobile Sidebar Overlay */
 .mobile-sidebar-overlay {
@@ -259,6 +259,9 @@
 /* Prevent body scroll when sidebar is open */
 body.sidebar-open {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* Sidebar Container */
@@ -269,6 +272,7 @@ body.sidebar-open {
   width: 85%;
   max-width: 340px;
   height: 100vh;
+  height: -webkit-fill-available;
   background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
   z-index: 2000;
   transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -282,7 +286,7 @@ body.sidebar-open {
   right: 0;
 }
 
-/* Premium Header */
+/* Premium Header - Fixed at top */
 .mobile-sidebar-header-premium {
   position: relative;
   padding: 1.8rem 1.5rem 1.5rem;
@@ -435,24 +439,18 @@ body.sidebar-open {
   100% { background-position: 200% 0; }
 }
 
-/* Navigation Container - Fixed for Android */
+/* Scrollable Navigation Area - Takes remaining space but respects footer */
 .mobile-nav-container-premium {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0.5rem 0;
   position: relative;
   min-height: 0;
-  max-height: 100%;
-}
-/* Mobile Sidebar Content Wrapper - Ensures footer is always visible */
-.mobile-sidebar-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Custom scrollbar */
 .mobile-nav-container-premium::-webkit-scrollbar {
   width: 4px;
 }
@@ -551,13 +549,15 @@ body.sidebar-open {
   animation: pulseDot 2s infinite;
 }
 
-/* Premium Footer */
+/* Premium Footer - ALWAYS VISIBLE AT BOTTOM */
 .mobile-footer-premium {
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   padding: 1rem 1.2rem 1.5rem;
   flex-shrink: 0;
   margin-top: auto;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-divider {
@@ -1629,21 +1629,6 @@ body.sidebar-open {
   display: flex;
 }
 
-/* Android Specific Fixes */
-@media (max-width: 768px) {
-  .mobile-sidebar {
-    height: 100vh;
-    height: -webkit-fill-available;
-  }
-  
-  .mobile-nav-container-premium {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-
-}
 /* Mobile Specific Styles */
 @media (max-width: 768px) {
   /* Hide desktop buttons on mobile */
@@ -1794,26 +1779,11 @@ body.sidebar-open {
     gap: 0.5rem;
   }
   
- /* Sidebar Container - Fixed for Android */
-.mobile-sidebar {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 85%;
-  max-width: 340px;
-  height: 100vh;
-  background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1a 100%);
-  z-index: 2000;
-  transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  flex-direction: column;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-.mobile-sidebar.open {
-  right: 0;
-}
+  /* Mobile sidebar adjustments */
+  .mobile-sidebar {
+    width: 85%;
+    max-width: 320px;
+  }
   
   .avatar-premium {
     width: 50px;
@@ -1842,6 +1812,11 @@ body.sidebar-open {
   .action-btn-premium {
     padding: 0.75rem;
     font-size: 0.9rem;
+  }
+  
+  /* Ensure footer is always visible */
+  .mobile-footer-premium {
+    padding-bottom: env(safe-area-inset-bottom, 1.5rem);
   }
 }
 
@@ -1936,4 +1911,7 @@ body.sidebar-open {
 /* Ensure body scroll is disabled when sidebar is open */
 body.sidebar-open {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
