@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -16,8 +16,6 @@ import {
 import '../styles/globals.css';
 import '../styles/animations.css';
 import '../styles/LandingPage.css';
-import { templatesData, getTemplatesByCategory } from '../templates/templatesRegistry';
-import TemplatePreviewModal from '../components/TemplatePreviewModal';
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -27,8 +25,15 @@ const LandingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [isManualClick, setIsManualClick] = useState(false);
+  const manualClickTimerRef = useRef(null);
+  const sectionsRef = useRef({
+    home: null,
+    features: null,
+    templates: null,
+    pricing: null,
+    testimonials: null
+  });
 
   const testimonialsData = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
@@ -61,15 +66,23 @@ const LandingPage = () => {
     return user.name.split(' ')[0];
   };
 
-  // Improved scroll to section function with active section update
+  // Improved scroll to section function with manual click flag
   const scrollToSection = (sectionId) => {
     // Close sidebar
     setMobileMenuOpen(false);
     
+    // Set manual click flag to prevent scroll detection from overriding
+    setIsManualClick(true);
+    
     // Update active section immediately
     setActiveSection(sectionId);
     
-    // Small delay to allow sidebar to close and DOM to update
+    // Clear any existing timer
+    if (manualClickTimerRef.current) {
+      clearTimeout(manualClickTimerRef.current);
+    }
+    
+    // Small delay to allow DOM to update
     setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -82,6 +95,11 @@ const LandingPage = () => {
           behavior: 'smooth'
         });
       }
+      
+      // Reset manual click flag after scroll animation completes
+      manualClickTimerRef.current = setTimeout(() => {
+        setIsManualClick(false);
+      }, 1000);
     }, 150);
   };
 
@@ -101,28 +119,37 @@ const LandingPage = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Update active section on scroll
+  // Update active section on scroll - but skip during manual click
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
       
-      // Check which section is in view and update active section
+      // Skip automatic detection during manual click or immediately after
+      if (isManualClick) return;
+      
+      // Get all section elements
       const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
+      let currentSection = activeSection;
+      
+      // Find which section is currently in view
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
-          // Consider section active when it's in view with some offset
+          // Section is considered active when its top is above 150px and bottom is above 100px
           if (rect.top <= 150 && rect.bottom >= 100) {
-            if (activeSection !== section) {
-              setActiveSection(section);
-            }
+            currentSection = section;
             break;
           }
         }
       }
       
-      // Fade on scroll
+      // Update active section if changed
+      if (currentSection !== activeSection) {
+        setActiveSection(currentSection);
+      }
+      
+      // Fade on scroll animation
       const fadeElements = document.querySelectorAll('.fade-on-scroll');
       fadeElements.forEach(el => {
         const rect = el.getBoundingClientRect();
@@ -135,7 +162,7 @@ const LandingPage = () => {
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeSection]);
+  }, [activeSection, isManualClick]);
 
   const features = [
     { icon: FaQrcode, title: 'Smart QR Codes', description: 'Dynamic QR codes with real-time tracking', color: '#FF3366', tag: 'New' },
@@ -463,15 +490,7 @@ const LandingPage = () => {
                   <img src={template.image} alt={template.name} />
                   <div className="template-overlay-premium">
                     <span className="template-price">{template.price}</span>
-                    <button 
-                      className="btn-preview"
-                      onClick={() => {
-                        setSelectedTemplate(template);
-                        setShowPreviewModal(true);
-                      }}
-                    >
-                      Preview Template
-                    </button>
+                    <button className="btn-preview">Preview Template</button>
                   </div>
                   {template.rating >= 4.8 && <div className="template-badge">Trending</div>}
                 </div>
@@ -703,17 +722,6 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-
-      {/* Preview Modal */}
-      {showPreviewModal && selectedTemplate && (
-        <TemplatePreviewModal
-          template={selectedTemplate}
-          onClose={() => {
-            setShowPreviewModal(false);
-            setSelectedTemplate(null);
-          }}
-        />
-      )}
     </div>
   );
 };
