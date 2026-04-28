@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -26,7 +26,22 @@ const LandingPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const testimonials = [
+  // Create refs for sections
+  const homeRef = useRef(null);
+  const featuresRef = useRef(null);
+  const templatesRef = useRef(null);
+  const pricingRef = useRef(null);
+  const testimonialsRef = useRef(null);
+
+  const sectionRefs = {
+    home: homeRef,
+    features: featuresRef,
+    templates: templatesRef,
+    pricing: pricingRef,
+    testimonials: testimonialsRef
+  };
+
+  const testimonialsData = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
     { id: 2, name: 'Anjali & Vikram', wedding: 'Delhi, Jan 2025', text: 'Incredible platform! The analytics helped us track RSVPs perfectly.', rating: 5, image: 'https://randomuser.me/api/portraits/women/2.jpg', location: 'Delhi' },
     { id: 3, name: 'Neha & Arjun', wedding: 'Bangalore, Feb 2025', text: 'Best investment for our wedding. The guest management feature is a lifesaver!', rating: 5, image: 'https://randomuser.me/api/portraits/women/3.jpg', location: 'Bangalore' },
@@ -36,7 +51,7 @@ const LandingPage = () => {
   ];
 
   const itemsPerPage = 3;
-  const totalSlides = Math.ceil(testimonials.length / itemsPerPage);
+  const totalSlides = Math.ceil(testimonialsData.length / itemsPerPage);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -48,13 +63,34 @@ const LandingPage = () => {
 
   const getVisibleTestimonials = () => {
     const start = currentSlide * itemsPerPage;
-    return testimonials.slice(start, start + itemsPerPage);
+    return testimonialsData.slice(start, start + itemsPerPage);
   };
 
   // Get user first name
   const getUserFirstName = () => {
     if (!user?.name) return null;
     return user.name.split(' ')[0];
+  };
+
+  // Improved scroll to section function
+  const scrollToSection = (sectionId) => {
+    // Close sidebar first
+    setMobileMenuOpen(false);
+    
+    // Small delay to allow sidebar to close
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const offset = 80; // Offset for fixed header
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - offset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 150);
   };
 
   // Handle body scroll when sidebar is open
@@ -77,6 +113,7 @@ const LandingPage = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
       
+      // Check which section is in view
       const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -89,6 +126,7 @@ const LandingPage = () => {
         }
       }
       
+      // Fade on scroll
       const fadeElements = document.querySelectorAll('.fade-on-scroll');
       fadeElements.forEach(el => {
         const rect = el.getBoundingClientRect();
@@ -102,14 +140,6 @@ const LandingPage = () => {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setMobileMenuOpen(false);
-    }
-  };
 
   const features = [
     { icon: FaQrcode, title: 'Smart QR Codes', description: 'Dynamic QR codes with real-time tracking', color: '#FF3366', tag: 'New' },
@@ -320,11 +350,11 @@ const LandingPage = () => {
           </div>
           
           <div className="nav-menu">
-            <a className={`nav-link ${activeSection === 'home' ? 'active' : ''}`} onClick={() => scrollToSection('home')}>Home</a>
-            <a className={`nav-link ${activeSection === 'features' ? 'active' : ''}`} onClick={() => scrollToSection('features')}>Features</a>
-            <a className={`nav-link ${activeSection === 'templates' ? 'active' : ''}`} onClick={() => scrollToSection('templates')}>Templates</a>
-            <a className={`nav-link ${activeSection === 'pricing' ? 'active' : ''}`} onClick={() => scrollToSection('pricing')}>Pricing</a>
-            <a className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`} onClick={() => scrollToSection('testimonials')}>Testimonials</a>
+            <a onClick={() => scrollToSection('home')} className={`nav-link ${activeSection === 'home' ? 'active' : ''}`}>Home</a>
+            <a onClick={() => scrollToSection('features')} className={`nav-link ${activeSection === 'features' ? 'active' : ''}`}>Features</a>
+            <a onClick={() => scrollToSection('templates')} className={`nav-link ${activeSection === 'templates' ? 'active' : ''}`}>Templates</a>
+            <a onClick={() => scrollToSection('pricing')} className={`nav-link ${activeSection === 'pricing' ? 'active' : ''}`}>Pricing</a>
+            <a onClick={() => scrollToSection('testimonials')} className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`}>Testimonials</a>
           </div>
           
           <div className="nav-buttons desktop-only">
@@ -351,7 +381,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="premium-hero">
+      <section id="home" ref={homeRef} className="premium-hero">
         <div className="hero-container">
           <div className="hero-badge animate-pulse-glow">
             <FaStar /> India's #1 Wedding Tech Platform 2025
@@ -394,7 +424,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="premium-features fade-on-scroll">
+      <section id="features" ref={featuresRef} className="premium-features fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Powerful Features</span>
@@ -417,7 +447,7 @@ const LandingPage = () => {
       </section>
 
       {/* Templates Section */}
-      <section id="templates" className="premium-templates fade-on-scroll">
+      <section id="templates" ref={templatesRef} className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Beautiful Designs</span>
@@ -458,7 +488,7 @@ const LandingPage = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="premium-pricing fade-on-scroll">
+      <section id="pricing" ref={pricingRef} className="premium-pricing fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Simple Pricing</span>
@@ -516,7 +546,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Slider Section */}
-      <section id="testimonials" className="premium-testimonials fade-on-scroll">
+      <section id="testimonials" ref={testimonialsRef} className="premium-testimonials fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Love Stories</span>
