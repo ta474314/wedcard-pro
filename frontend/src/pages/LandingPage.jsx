@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -16,6 +16,8 @@ import {
 import '../styles/globals.css';
 import '../styles/animations.css';
 import '../styles/LandingPage.css';
+import { templatesData, getTemplatesByCategory } from '../templates/templatesRegistry';
+import TemplatePreviewModal from '../components/TemplatePreviewModal';
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -25,21 +27,8 @@ const LandingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  // Create refs for sections
-  const homeRef = useRef(null);
-  const featuresRef = useRef(null);
-  const templatesRef = useRef(null);
-  const pricingRef = useRef(null);
-  const testimonialsRef = useRef(null);
-
-  const sectionRefs = {
-    home: homeRef,
-    features: featuresRef,
-    templates: templatesRef,
-    pricing: pricingRef,
-    testimonials: testimonialsRef
-  };
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   const testimonialsData = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
@@ -72,12 +61,15 @@ const LandingPage = () => {
     return user.name.split(' ')[0];
   };
 
-  // Improved scroll to section function
+  // Improved scroll to section function with active section update
   const scrollToSection = (sectionId) => {
-    // Close sidebar first
+    // Close sidebar
     setMobileMenuOpen(false);
     
-    // Small delay to allow sidebar to close
+    // Update active section immediately
+    setActiveSection(sectionId);
+    
+    // Small delay to allow sidebar to close and DOM to update
     setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
@@ -109,18 +101,22 @@ const LandingPage = () => {
     };
   }, [mobileMenuOpen]);
 
+  // Update active section on scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
       
-      // Check which section is in view
+      // Check which section is in view and update active section
       const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
+          // Consider section active when it's in view with some offset
+          if (rect.top <= 150 && rect.bottom >= 100) {
+            if (activeSection !== section) {
+              setActiveSection(section);
+            }
             break;
           }
         }
@@ -139,7 +135,7 @@ const LandingPage = () => {
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [activeSection]);
 
   const features = [
     { icon: FaQrcode, title: 'Smart QR Codes', description: 'Dynamic QR codes with real-time tracking', color: '#FF3366', tag: 'New' },
@@ -381,7 +377,7 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" ref={homeRef} className="premium-hero">
+      <section id="home" className="premium-hero">
         <div className="hero-container">
           <div className="hero-badge animate-pulse-glow">
             <FaStar /> India's #1 Wedding Tech Platform 2025
@@ -424,7 +420,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" ref={featuresRef} className="premium-features fade-on-scroll">
+      <section id="features" className="premium-features fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Powerful Features</span>
@@ -447,7 +443,7 @@ const LandingPage = () => {
       </section>
 
       {/* Templates Section */}
-      <section id="templates" ref={templatesRef} className="premium-templates fade-on-scroll">
+      <section id="templates" className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Beautiful Designs</span>
@@ -467,7 +463,15 @@ const LandingPage = () => {
                   <img src={template.image} alt={template.name} />
                   <div className="template-overlay-premium">
                     <span className="template-price">{template.price}</span>
-                    <button className="btn-preview">Preview</button>
+                    <button 
+                      className="btn-preview"
+                      onClick={() => {
+                        setSelectedTemplate(template);
+                        setShowPreviewModal(true);
+                      }}
+                    >
+                      Preview Template
+                    </button>
                   </div>
                   {template.rating >= 4.8 && <div className="template-badge">Trending</div>}
                 </div>
@@ -488,7 +492,7 @@ const LandingPage = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" ref={pricingRef} className="premium-pricing fade-on-scroll">
+      <section id="pricing" className="premium-pricing fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Simple Pricing</span>
@@ -546,7 +550,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Slider Section */}
-      <section id="testimonials" ref={testimonialsRef} className="premium-testimonials fade-on-scroll">
+      <section id="testimonials" className="premium-testimonials fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Love Stories</span>
@@ -699,6 +703,17 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Preview Modal */}
+      {showPreviewModal && selectedTemplate && (
+        <TemplatePreviewModal
+          template={selectedTemplate}
+          onClose={() => {
+            setShowPreviewModal(false);
+            setSelectedTemplate(null);
+          }}
+        />
+      )}
     </div>
   );
 };
