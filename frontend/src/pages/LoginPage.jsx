@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
@@ -7,7 +7,7 @@ import {
   FaHeart, FaEnvelope, FaLock, FaUser, FaPhone, 
   FaArrowRight, FaEye, FaEyeSlash, FaCheckCircle, 
   FaSpinner, FaMagic, FaCopy, FaCheck, FaStar, FaKey,
-  FaHome, FaArrowLeft, FaGoogle, FaFacebook, FaGithub
+  FaHome, FaArrowLeft, FaTimes
 } from 'react-icons/fa';
 import '../styles/globals.css';
 import '../styles/animations.css';
@@ -32,7 +32,18 @@ const LoginPage = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
-  const API_URL = 'http://localhost:5000/api';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+  useEffect(() => {
+    if (step === 'otp') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [step]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -173,9 +184,9 @@ const LoginPage = () => {
                 <FaHeart className="otp-heart" />
                 <span>Wed<span className="text-gold">Card</span> Pro</span>
               </div>
-              <Link to="/" className="home-link-small">
-                <FaHome /> Home
-              </Link>
+              <button onClick={backToForm} className="otp-close-btn">
+                <FaTimes />
+              </button>
             </div>
             
             <div className="otp-content">
@@ -214,10 +225,6 @@ const LoginPage = () => {
                   {resendLoading ? <FaSpinner className="spinning" /> : 'Resend OTP'}
                 </button>
               </div>
-              
-              <button onClick={backToForm} className="otp-back-btn">
-                ← Back to Registration
-              </button>
             </div>
           </div>
         </div>
@@ -243,23 +250,20 @@ const LoginPage = () => {
         <FaStar className="floating-star star-2" />
       </div>
 
-      {/* Bottom Navigation Bar for Mobile */}
+      <Link to="/" className="desktop-back-home">
+        <FaArrowLeft />
+        <span>Back to Home</span>
+      </Link>
+
       <div className="bottom-nav-bar">
         <Link to="/" className="bottom-nav-home">
           <FaHome />
           <span>Home</span>
         </Link>
-        <div className="bottom-nav-indicator"></div>
       </div>
 
       <div className="login-container-premium">
         <div className="login-card-premium">
-          {/* Desktop Back Button */}
-          <Link to="/" className="desktop-back-home">
-            <FaArrowLeft />
-            <span>Back to Home</span>
-          </Link>
-          
           <div className="login-header-premium">
             <div className="login-logo-premium">
               <div className="logo-glow">
@@ -386,7 +390,7 @@ const LoginPage = () => {
                   <FaMagic className="demo-magic-icon" />
                   <span>Try Demo Account</span>
                 </div>
-                <button onClick={copyDemoCredentials} className="copy-demo-btn" title="Copy credentials">
+                <button onClick={copyDemoCredentials} className="copy-demo-btn">
                   {copied ? <FaCheck /> : <FaCopy />}
                   <span>{copied ? 'Copied!' : 'Copy'}</span>
                 </button>
