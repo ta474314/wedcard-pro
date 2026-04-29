@@ -12,10 +12,31 @@ import {
   FaGlobe, FaPoll, FaCcVisa, FaCcMastercard, FaCcPaypal, FaRupeeSign,
   FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt, FaTimesCircle
 } from 'react-icons/fa';
-import { templatesRegistry } from '../templates/templatesRegistry';
 import '../styles/globals.css';
 import '../styles/animations.css';
 import '../styles/LandingPage.css';
+
+// Dynamically import all template files from the templates folder
+const templateModules = import.meta.glob('../templates/*.jsx', { eager: true });
+
+// Build templates array from imported modules
+const buildTemplatesArray = () => {
+  const templates = [];
+  for (const path in templateModules) {
+    const module = templateModules[path];
+    // Only include files that export both a default component and templateMeta
+    if (module.default && module.templateMeta) {
+      templates.push({
+        id: path, // unique identifier using file path
+        component: module.default,
+        ...module.templateMeta
+      });
+    }
+  }
+  return templates;
+};
+
+const allTemplates = buildTemplatesArray();
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -107,7 +128,6 @@ const LandingPage = () => {
     setSelectedTemplate(null);
   };
 
-  // Demo data passed to every template in the modal
   const demoInvitationData = {
     coupleNames: "Raj & Simran",
     weddingDate: "December 25, 2025",
@@ -152,7 +172,7 @@ const LandingPage = () => {
       monthlyPrice: 1999,
       yearlyPrice: 19190,
       icon: FaStar,
-      features: ['Unlimited Invitations', 'Up to 1000 Guests', 'All 50+ Templates', 'Dynamic QR Codes', 'Priority Support 24/7', 'Advanced Analytics', 'Photo Gallery (10GB)', 'WhatsApp Integration'],
+      features: ['Unlimited Invitations', 'Up to 1000 Guests', 'All Templates', 'Dynamic QR Codes', 'Priority Support 24/7', 'Advanced Analytics', 'Photo Gallery (10GB)', 'WhatsApp Integration'],
       color: '#FFD700',
       recommended: true,
       buttonText: 'Get Started'
@@ -174,13 +194,13 @@ const LandingPage = () => {
     { number: '2L+', label: 'Invitations Sent', icon: FaEnvelope },
     { number: '98%', label: 'RSVP Rate', icon: FaPoll },
     { number: '24/7', label: 'Support', icon: FaHeadset },
-    { number: '500+', label: 'Templates', icon: FaPaintBrush },
+    { number: `${allTemplates.length}+`, label: 'Templates', icon: FaPaintBrush },
     { number: '150+', label: 'Cities', icon: FaGlobe }
   ];
 
   const filteredTemplates = activeFilter === 'all' 
-    ? templatesRegistry 
-    : templatesRegistry.filter(t => t.category === activeFilter);
+    ? allTemplates 
+    : allTemplates.filter(t => t.category === activeFilter);
 
   return (
     <div className="landing-page-premium">
@@ -214,7 +234,7 @@ const LandingPage = () => {
         </div>
       )}
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar (unchanged) */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-sidebar-header">
@@ -332,12 +352,12 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Templates Section – Dynamic from Registry */}
+      {/* Templates Section – Auto‑discovered */}
       <section id="templates" className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Beautiful Designs</span>
-            <h2>Choose from <span className="gradient-text-gold">All Our Templates</span></h2>
+            <h2>Choose from <span className="gradient-text-gold">{allTemplates.length}+ Templates</span></h2>
             <p>Professionally designed templates for every wedding style</p>
           </div>
           <div className="templates-filter">
@@ -345,6 +365,9 @@ const LandingPage = () => {
             <button className={`filter-btn ${activeFilter === 'luxury' ? 'active' : ''}`} onClick={() => setActiveFilter('luxury')}>Luxury</button>
             <button className={`filter-btn ${activeFilter === 'modern' ? 'active' : ''}`} onClick={() => setActiveFilter('modern')}>Modern</button>
             <button className={`filter-btn ${activeFilter === 'destination' ? 'active' : ''}`} onClick={() => setActiveFilter('destination')}>Destination</button>
+            <button className={`filter-btn ${activeFilter === 'vintage' ? 'active' : ''}`} onClick={() => setActiveFilter('vintage')}>Vintage</button>
+            <button className={`filter-btn ${activeFilter === 'floral' ? 'active' : ''}`} onClick={() => setActiveFilter('floral')}>Floral</button>
+            <button className={`filter-btn ${activeFilter === 'spiritual' ? 'active' : ''}`} onClick={() => setActiveFilter('spiritual')}>Spiritual</button>
           </div>
           <div className="templates-slider">
             {filteredTemplates.map((template) => (
@@ -373,7 +396,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Pricing Section (unchanged) */}
       <section id="pricing" className="premium-pricing fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -421,7 +444,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Slider */}
+      {/* Testimonials Slider (unchanged) */}
       <section id="testimonials" className="premium-testimonials fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -463,7 +486,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section (unchanged) */}
       <section className="premium-cta fade-on-scroll">
         <div className="cta-container">
           <div className="cta-content">
@@ -482,7 +505,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer (unchanged) */}
       <footer className="premium-footer">
         <div className="container">
           <div className="footer-grid-premium">
