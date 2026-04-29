@@ -26,17 +26,10 @@ const LandingPage = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Reference to prevent scroll detection during manual clicks
-  const isManualClickRef = useRef(false);
-  const manualClickTimerRef = useRef(null);
-  
-  const sectionsRef = useRef({
-    home: null,
-    features: null,
-    templates: null,
-    pricing: null,
-    testimonials: null
-  });
+  // Refs for manual scroll prevention
+  const isManualScrolling = useRef(false);
+  const manualScrollTimer = useRef(null);
+  const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
 
   const testimonialsData = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
@@ -68,42 +61,84 @@ const LandingPage = () => {
     return user.name.split(' ')[0];
   };
 
-  // Improved scroll to section function
+  // Helper: Get current section based on scroll position
+  const getCurrentSection = () => {
+    const scrollPos = window.scrollY + 120; // offset for fixed header
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const { offsetTop, offsetHeight } = element;
+        if (scrollPos >= offsetTop && scrollPos < offsetTop + offsetHeight) {
+          return section;
+        }
+      }
+    }
+    return 'home';
+  };
+
+  // Update active section based on scroll (with manual flag protection)
+  const updateActiveSectionFromScroll = () => {
+    if (isManualScrolling.current) return;
+    const current = getCurrentSection();
+    if (current !== activeSection) {
+      setActiveSection(current);
+    }
+  };
+
+  // Improved scroll to section with immediate highlight
   const scrollToSection = (sectionId) => {
     // Close mobile sidebar
     setMobileMenuOpen(false);
     
-    // Set manual click flag to prevent scroll detection from interfering
-    isManualClickRef.current = true;
+    // Set manual scrolling flag to prevent scroll detection from interfering
+    isManualScrolling.current = true;
     
-    // Immediately update active section state (this makes sidebar highlight change instantly)
+    // Immediately update active section (this highlights the clicked menu instantly)
     setActiveSection(sectionId);
     
     // Clear any existing timer
-    if (manualClickTimerRef.current) {
-      clearTimeout(manualClickTimerRef.current);
+    if (manualScrollTimer.current) {
+      clearTimeout(manualScrollTimer.current);
     }
     
-    // Small delay to allow DOM to update
-    setTimeout(() => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const offset = 80; // Offset for fixed header
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - offset;
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
+    // Get target element
+    const element = document.getElementById(sectionId);
+    if (!element) {
+      isManualScrolling.current = false;
+      return;
+    }
+    
+    const offset = 80;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - offset;
+    
+    // Perform smooth scroll
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+    
+    // After scroll animation completes (typically 500-800ms), re-enable auto-detection
+    // and sync active section to ensure it matches the final position
+    manualScrollTimer.current = setTimeout(() => {
+      isManualScrolling.current = false;
+      // Final sync: set active section based on where we ended up
+      const finalSection = getCurrentSection();
+      if (finalSection !== sectionId) {
+        setActiveSection(finalSection);
       }
-      
-      // Reset manual click flag after scroll animation completes (1.5 seconds)
-      manualClickTimerRef.current = setTimeout(() => {
-        isManualClickRef.current = false;
-      }, 1500);
-    }, 100);
+    }, 1000);
   };
+
+  // Sync active section when sidebar is opened (in case user scrolled manually)
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      const current = getCurrentSection();
+      if (current !== activeSection) {
+        setActiveSection(current);
+      }
+    }
+  }, [mobileMenuOpen]);
 
   // Handle body scroll lock when sidebar is open
   useEffect(() => {
@@ -120,33 +155,11 @@ const LandingPage = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Update active section on scroll - but only when not in manual click mode
+  // Scroll event listener for header background and active section
   useEffect(() => {
     const handleScroll = () => {
-      // Update scrolled state for header background
       setScrolled(window.scrollY > 50);
-      
-      // Skip auto-detection during manual click
-      if (isManualClickRef.current) return;
-      
-      const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
-      let currentSection = activeSection;
-      const scrollPosition = window.scrollY + 120; // threshold for highlighting
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const { offsetTop, offsetHeight } = element;
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            currentSection = section;
-            break;
-          }
-        }
-      }
-      
-      if (currentSection !== activeSection) {
-        setActiveSection(currentSection);
-      }
+      updateActiveSectionFromScroll();
       
       // Fade on scroll animation
       const fadeElements = document.querySelectorAll('.fade-on-scroll');
@@ -247,7 +260,6 @@ const LandingPage = () => {
       {/* ==================== PREMIUM MOBILE SIDEBAR ==================== */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        {/* Premium Header with Gradient */}
         <div className="mobile-sidebar-header-premium">
           <div className="header-glow"></div>
           <div className="header-content-premium">
@@ -285,7 +297,6 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Premium Navigation */}
         <div className="mobile-nav-container-premium">
           <nav className="mobile-nav-premium">
             <a onClick={() => scrollToSection('home')} className={`nav-link-premium ${activeSection === 'home' ? 'active' : ''}`}>
@@ -316,7 +327,6 @@ const LandingPage = () => {
           </nav>
         </div>
 
-        {/* Premium Footer Actions */}
         <div className="mobile-footer-premium">
           <div className="footer-divider"></div>
           <div className="action-buttons-premium">
@@ -566,7 +576,7 @@ const LandingPage = () => {
             
             <div className="testimonials-slider-wrapper">
               <div className="testimonials-slider">
-                {getVisibleTestimonials().map((testimonial, index) => (
+                {getVisibleTestimonials().map((testimonial) => (
                   <div key={testimonial.id} className="testimonial-card">
                     <div className="testimonial-content">
                       <FaHeart className="quote-icon" />
