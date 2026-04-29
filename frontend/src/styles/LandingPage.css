@@ -111,7 +111,6 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  cursor: pointer;
 }
 
 .logo-icon {
@@ -188,7 +187,6 @@
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 0.95rem;
-  cursor: pointer;
 }
 
 .btn-outline-premium:hover {
@@ -209,7 +207,6 @@
   gap: 0.5rem;
   transition: all 0.3s ease;
   font-size: 0.95rem;
-  cursor: pointer;
 }
 
 .btn-premium-glow:hover {
@@ -237,7 +234,9 @@
   color: #FFD700;
 }
 
-/* ==================== PREMIUM MOBILE SIDEBAR ==================== */
+/* ==================== PREMIUM MOBILE SIDEBAR - FIXED BOTTOM BUTTONS ==================== */
+
+/* Mobile Sidebar Overlay */
 .mobile-sidebar-overlay {
   position: fixed;
   top: 0;
@@ -257,6 +256,7 @@
   visibility: visible;
 }
 
+/* Prevent body scroll when sidebar is open */
 body.sidebar-open {
   overflow: hidden;
   position: fixed;
@@ -264,6 +264,7 @@ body.sidebar-open {
   height: 100%;
 }
 
+/* Sidebar Container */
 .mobile-sidebar {
   position: fixed;
   top: 0;
@@ -285,6 +286,7 @@ body.sidebar-open {
   right: 0;
 }
 
+/* Premium Header - Fixed at top */
 .mobile-sidebar-header-premium {
   position: relative;
   padding: 1.8rem 1.5rem 1.5rem;
@@ -347,6 +349,12 @@ body.sidebar-open {
   border-color: #FFD700;
 }
 
+.avatar-text-premium {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .status-dot-premium {
   position: absolute;
   bottom: 4px;
@@ -380,6 +388,12 @@ body.sidebar-open {
   font-weight: 700;
   color: white;
   margin-top: 2px;
+}
+
+.brand-premium {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
 }
 
 .gold-premium {
@@ -425,6 +439,7 @@ body.sidebar-open {
   100% { background-position: 200% 0; }
 }
 
+/* Scrollable Navigation Area - Takes remaining space but respects footer */
 .mobile-nav-container-premium {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -435,6 +450,7 @@ body.sidebar-open {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Custom scrollbar */
 .mobile-nav-container-premium::-webkit-scrollbar {
   width: 4px;
 }
@@ -449,6 +465,7 @@ body.sidebar-open {
   border-radius: 4px;
 }
 
+/* Premium Navigation Items */
 .mobile-nav-premium {
   display: flex;
   flex-direction: column;
@@ -470,15 +487,30 @@ body.sidebar-open {
   overflow: hidden;
 }
 
+.nav-link-premium::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 51, 102, 0.1), transparent);
+  transition: width 0.3s ease;
+}
+
+.nav-link-premium:hover::before {
+  width: 100%;
+}
+
+.nav-link-premium:hover {
+  color: #FF3366;
+  transform: translateX(5px);
+}
+
 .nav-link-premium.active {
   background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), transparent);
   color: #FFD700;
   border-left: 3px solid #FFD700;
-}
-
-.nav-link-premium.active .nav-icon-premium {
-  background: rgba(255, 215, 0, 0.15);
-  color: #FFD700;
 }
 
 .nav-icon-premium {
@@ -491,6 +523,16 @@ body.sidebar-open {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   transition: all 0.3s ease;
+}
+
+.nav-link-premium:hover .nav-icon-premium {
+  background: rgba(255, 51, 102, 0.15);
+  transform: scale(1.05);
+}
+
+.nav-link-premium.active .nav-icon-premium {
+  background: rgba(255, 215, 0, 0.15);
+  color: #FFD700;
 }
 
 .nav-text-premium {
@@ -507,6 +549,7 @@ body.sidebar-open {
   animation: pulseDot 2s infinite;
 }
 
+/* Premium Footer - ALWAYS VISIBLE AT BOTTOM */
 .mobile-footer-premium {
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -545,6 +588,24 @@ body.sidebar-open {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+}
+
+.action-btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.action-btn-premium:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .signin-btn {
@@ -1172,6 +1233,7 @@ body.sidebar-open {
   display: inline-block;
   padding: 0.8rem;
   border-radius: 12px;
+  text-align: center;
   text-decoration: none;
   font-weight: 600;
   display: flex;
@@ -1179,10 +1241,6 @@ body.sidebar-open {
   justify-content: center;
   gap: 0.5rem;
   font-size: 1rem;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #0a0a0f;
-  border: none;
-  cursor: pointer;
 }
 
 .pricing-note {
@@ -1560,178 +1618,60 @@ body.sidebar-open {
   transform: translateY(0);
 }
 
-/* Auth Modal */
-.auth-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(8px);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.auth-modal {
-  background: linear-gradient(145deg, #1a1a2e, #0f0f1a);
-  border-radius: 24px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 420px;
-  position: relative;
-  border: 1px solid rgba(255,215,0,0.2);
-}
-
-.auth-modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(255,255,255,0.1);
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  color: white;
-  cursor: pointer;
-}
-
-.auth-modal h2 {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.auth-modal p {
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 1.5rem;
-}
-
-.auth-modal form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.auth-modal input {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  padding: 0.8rem;
-  color: white;
-  font-size: 0.9rem;
-}
-
-.auth-submit {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #0a0a0f;
-  padding: 0.8rem;
-  border-radius: 12px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-.auth-divider {
-  text-align: center;
-  position: relative;
-  margin: 1rem 0;
-}
-
-.auth-divider span {
-  background: #0f0f1a;
-  padding: 0 0.5rem;
-  color: rgba(255,255,255,0.5);
-}
-
-.auth-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: rgba(255,255,255,0.1);
-  z-index: -1;
-}
-
-.social-auth {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.social-auth button {
-  flex: 1;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 0.7rem;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.auth-switch {
-  text-align: center;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-}
-
-.auth-switch span {
-  color: #FFD700;
-  cursor: pointer;
-}
-
 /* Animations */
 @keyframes heartbeat {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
 }
 
-/* Desktop only */
+/* Desktop only buttons - hidden on mobile */
 .desktop-only {
   display: flex;
 }
 
-/* Mobile Styles */
+/* Mobile Specific Styles */
 @media (max-width: 768px) {
+  /* Hide desktop buttons on mobile */
   .desktop-only {
     display: none !important;
   }
   
+  /* Show mobile menu button */
   .mobile-menu-btn {
     display: flex !important;
   }
   
+  /* Hide nav-menu on mobile */
   .nav-menu {
     display: none !important;
   }
   
+  /* Adjust hero section padding for mobile */
   .premium-hero {
     padding: 6rem 1rem 2rem;
   }
   
+  /* Adjust container padding */
   .container {
     padding: 0 1rem;
   }
   
+  /* Make logo text smaller on mobile */
   .logo-text {
     font-size: 1.2rem;
   }
   
+  /* Hide logo badge on mobile */
   .logo-badge {
     display: none;
   }
   
+  /* Adjust nav container padding */
   .nav-container {
     padding: 0 1rem;
   }
   
+  /* Adjust hero title */
   .hero-title {
     font-size: 2rem;
   }
@@ -1839,6 +1779,7 @@ body.sidebar-open {
     gap: 0.5rem;
   }
   
+  /* Mobile sidebar adjustments */
   .mobile-sidebar {
     width: 85%;
     max-width: 320px;
@@ -1873,6 +1814,7 @@ body.sidebar-open {
     font-size: 0.9rem;
   }
   
+  /* Ensure footer is always visible */
   .mobile-footer-premium {
     padding-bottom: env(safe-area-inset-bottom, 1.5rem);
   }
@@ -1944,25 +1886,32 @@ body.sidebar-open {
 
 /* Desktop styles */
 @media (min-width: 769px) {
+  /* Hide mobile menu button on desktop */
   .mobile-menu-btn {
     display: none !important;
   }
   
+  /* Show desktop navigation */
   .nav-menu {
     display: flex !important;
   }
   
+  /* Show desktop buttons */
   .desktop-only {
     display: flex !important;
   }
   
+  /* Hide mobile sidebar elements on desktop */
   .mobile-sidebar-overlay,
   .mobile-sidebar {
     display: none !important;
   }
 }
 
-/* Scroll margin for fixed header */
-section {
-  scroll-margin-top: 80px;
+/* Ensure body scroll is disabled when sidebar is open */
+body.sidebar-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
