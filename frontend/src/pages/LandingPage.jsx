@@ -50,25 +50,25 @@ const LandingPage = () => {
     return testimonials.slice(start, start + itemsPerPage);
   };
 
-  // Get user first name
   const getUserFirstName = () => {
     if (!user?.name) return null;
     return user.name.split(' ')[0];
   };
 
-  // Handle body scroll when sidebar is open
-// Handle body scroll when sidebar is open
-useEffect(() => {
-  if (mobileMenuOpen) {
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = 'unset';
-  }
-  
-  return () => {
-    document.body.style.overflow = 'unset';
-  };
-}, [mobileMenuOpen]);
+  // Lock/unlock body scroll when sidebar opens/closes
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.classList.remove('sidebar-open');
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.classList.remove('sidebar-open');
+    };
+  }, [mobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -189,7 +189,7 @@ useEffect(() => {
         <div className="grid-pattern"></div>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Enhanced Mobile Sidebar */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-sidebar-header">
@@ -253,7 +253,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Desktop Navigation */}
+      {/* Desktop Navigation (unchanged) */}
       <nav className={`premium-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">
@@ -295,7 +295,7 @@ useEffect(() => {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section (unchanged) */}
       <section id="home" className="premium-hero">
         <div className="hero-container">
           <div className="hero-badge animate-pulse-glow">
@@ -338,7 +338,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section (unchanged) */}
       <section id="features" className="premium-features fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -361,7 +361,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Templates Section */}
+      {/* Templates Section (unchanged) */}
       <section id="templates" className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -402,7 +402,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Pricing Section (unchanged) */}
       <section id="pricing" className="premium-pricing fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -460,7 +460,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Testimonials Slider Section */}
+      {/* Testimonials Section (unchanged) */}
       <section id="testimonials" className="premium-testimonials fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -476,7 +476,7 @@ useEffect(() => {
             
             <div className="testimonials-slider-wrapper">
               <div className="testimonials-slider">
-                {getVisibleTestimonials().map((testimonial, index) => (
+                {getVisibleTestimonials().map((testimonial) => (
                   <div key={testimonial.id} className="testimonial-card">
                     <div className="testimonial-content">
                       <FaHeart className="quote-icon" />
@@ -516,7 +516,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section (unchanged) */}
       <section className="premium-cta fade-on-scroll">
         <div className="cta-container">
           <div className="cta-content">
@@ -539,7 +539,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Footer (unchanged) */}
       <footer className="premium-footer">
         <div className="container">
           <div className="footer-grid-premium">
