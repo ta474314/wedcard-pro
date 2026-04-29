@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -10,8 +10,7 @@ import {
   FaBars, FaTimes, FaVideo, FaHeadset,
   FaRobot, FaWhatsapp, FaApple, FaGoogle,
   FaGlobe, FaPoll, FaCcVisa, FaCcMastercard, FaCcPaypal, FaRupeeSign,
-  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt,
-  FaGift
+  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt
 } from 'react-icons/fa';
 import '../styles/globals.css';
 import '../styles/animations.css';
@@ -25,13 +24,8 @@ const LandingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-  
-  // Refs for manual scroll prevention
-  const isManualScrolling = useRef(false);
-  const manualScrollTimer = useRef(null);
-  const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
 
-  const testimonialsData = [
+  const testimonials = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
     { id: 2, name: 'Anjali & Vikram', wedding: 'Delhi, Jan 2025', text: 'Incredible platform! The analytics helped us track RSVPs perfectly.', rating: 5, image: 'https://randomuser.me/api/portraits/women/2.jpg', location: 'Delhi' },
     { id: 3, name: 'Neha & Arjun', wedding: 'Bangalore, Feb 2025', text: 'Best investment for our wedding. The guest management feature is a lifesaver!', rating: 5, image: 'https://randomuser.me/api/portraits/women/3.jpg', location: 'Bangalore' },
@@ -41,7 +35,7 @@ const LandingPage = () => {
   ];
 
   const itemsPerPage = 3;
-  const totalSlides = Math.ceil(testimonialsData.length / itemsPerPage);
+  const totalSlides = Math.ceil(testimonials.length / itemsPerPage);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % totalSlides);
@@ -53,115 +47,45 @@ const LandingPage = () => {
 
   const getVisibleTestimonials = () => {
     const start = currentSlide * itemsPerPage;
-    return testimonialsData.slice(start, start + itemsPerPage);
+    return testimonials.slice(start, start + itemsPerPage);
   };
 
+  // Get user first name
   const getUserFirstName = () => {
     if (!user?.name) return null;
     return user.name.split(' ')[0];
   };
 
-  // Helper: Get current section based on scroll position
-  const getCurrentSection = () => {
-    const scrollPos = window.scrollY + 120; // offset for fixed header
-    for (const section of sections) {
-      const element = document.getElementById(section);
-      if (element) {
-        const { offsetTop, offsetHeight } = element;
-        if (scrollPos >= offsetTop && scrollPos < offsetTop + offsetHeight) {
-          return section;
-        }
-      }
-    }
-    return 'home';
+  // Handle body scroll when sidebar is open
+// Handle body scroll when sidebar is open
+useEffect(() => {
+  if (mobileMenuOpen) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'unset';
+  }
+  
+  return () => {
+    document.body.style.overflow = 'unset';
   };
+}, [mobileMenuOpen]);
 
-  // Update active section based on scroll (with manual flag protection)
-  const updateActiveSectionFromScroll = () => {
-    if (isManualScrolling.current) return;
-    const current = getCurrentSection();
-    if (current !== activeSection) {
-      setActiveSection(current);
-    }
-  };
-
-  // Improved scroll to section with immediate highlight
-  const scrollToSection = (sectionId) => {
-    // Close mobile sidebar
-    setMobileMenuOpen(false);
-    
-    // Set manual scrolling flag to prevent scroll detection from interfering
-    isManualScrolling.current = true;
-    
-    // Immediately update active section (this highlights the clicked menu instantly)
-    setActiveSection(sectionId);
-    
-    // Clear any existing timer
-    if (manualScrollTimer.current) {
-      clearTimeout(manualScrollTimer.current);
-    }
-    
-    // Get target element
-    const element = document.getElementById(sectionId);
-    if (!element) {
-      isManualScrolling.current = false;
-      return;
-    }
-    
-    const offset = 80;
-    const elementPosition = element.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - offset;
-    
-    // Perform smooth scroll
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: 'smooth'
-    });
-    
-    // After scroll animation completes (typically 500-800ms), re-enable auto-detection
-    // and sync active section to ensure it matches the final position
-    manualScrollTimer.current = setTimeout(() => {
-      isManualScrolling.current = false;
-      // Final sync: set active section based on where we ended up
-      const finalSection = getCurrentSection();
-      if (finalSection !== sectionId) {
-        setActiveSection(finalSection);
-      }
-    }, 1000);
-  };
-
-  // Sync active section when sidebar is opened (in case user scrolled manually)
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      const current = getCurrentSection();
-      if (current !== activeSection) {
-        setActiveSection(current);
-      }
-    }
-  }, [mobileMenuOpen]);
-
-  // Handle body scroll lock when sidebar is open
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('sidebar-open');
-    } else {
-      document.body.style.overflow = 'unset';
-      document.body.classList.remove('sidebar-open');
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-      document.body.classList.remove('sidebar-open');
-    };
-  }, [mobileMenuOpen]);
-
-  // Scroll event listener for header background and active section
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      updateActiveSectionFromScroll();
       
-      // Fade on scroll animation
+      const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+      
       const fadeElements = document.querySelectorAll('.fade-on-scroll');
       fadeElements.forEach(el => {
         const rect = el.getBoundingClientRect();
@@ -172,9 +96,17 @@ const LandingPage = () => {
     };
     
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // initial check
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeSection]);
+  }, []);
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setMobileMenuOpen(false);
+    }
+  };
 
   const features = [
     { icon: FaQrcode, title: 'Smart QR Codes', description: 'Dynamic QR codes with real-time tracking', color: '#FF3366', tag: 'New' },
@@ -257,101 +189,67 @@ const LandingPage = () => {
         <div className="grid-pattern"></div>
       </div>
 
-      {/* ==================== PREMIUM MOBILE SIDEBAR ==================== */}
+      {/* Mobile Sidebar */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="mobile-sidebar-header-premium">
-          <div className="header-glow"></div>
-          <div className="header-content-premium">
-            <div className="user-profile-premium">
-              <div className="avatar-ring-premium">
-                <div className="avatar-premium">
-                  {user ? (
-                    <span className="avatar-text-premium">{getUserFirstName()?.charAt(0) || 'U'}</span>
-                  ) : (
-                    <FaUser />
-                  )}
-                </div>
-                <div className="status-dot-premium"></div>
-              </div>
-              <div className="user-greeting-premium">
-                {user ? (
-                  <>
-                    <span className="greeting-premium">Welcome back,</span>
-                    <span className="username-premium">{getUserFirstName() || 'User'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="greeting-premium">Welcome to</span>
-                    <span className="brand-premium">Wed<span className="gold-premium">Card</span> Pro</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <button className="close-btn-premium" onClick={() => setMobileMenuOpen(false)}>
-              <FaTimes />
-            </button>
+        <div className="mobile-sidebar-header">
+          <div className="mobile-user-avatar-large">
+            <FaUser />
           </div>
-          <div className="header-decoration">
-            <div className="decoration-line"></div>
-          </div>
-        </div>
-
-        <div className="mobile-nav-container-premium">
-          <nav className="mobile-nav-premium">
-            <a onClick={() => scrollToSection('home')} className={`nav-link-premium ${activeSection === 'home' ? 'active' : ''}`}>
-              <div className="nav-icon-premium"><FaHeart /></div>
-              <span className="nav-text-premium">Home</span>
-              {activeSection === 'home' && <div className="nav-active-dot"></div>}
-            </a>
-            <a onClick={() => scrollToSection('features')} className={`nav-link-premium ${activeSection === 'features' ? 'active' : ''}`}>
-              <div className="nav-icon-premium"><FaStar /></div>
-              <span className="nav-text-premium">Features</span>
-              {activeSection === 'features' && <div className="nav-active-dot"></div>}
-            </a>
-            <a onClick={() => scrollToSection('templates')} className={`nav-link-premium ${activeSection === 'templates' ? 'active' : ''}`}>
-              <div className="nav-icon-premium"><FaImages /></div>
-              <span className="nav-text-premium">Templates</span>
-              {activeSection === 'templates' && <div className="nav-active-dot"></div>}
-            </a>
-            <a onClick={() => scrollToSection('pricing')} className={`nav-link-premium ${activeSection === 'pricing' ? 'active' : ''}`}>
-              <div className="nav-icon-premium"><FaRupeeSign /></div>
-              <span className="nav-text-premium">Pricing</span>
-              {activeSection === 'pricing' && <div className="nav-active-dot"></div>}
-            </a>
-            <a onClick={() => scrollToSection('testimonials')} className={`nav-link-premium ${activeSection === 'testimonials' ? 'active' : ''}`}>
-              <div className="nav-icon-premium"><FaUsers /></div>
-              <span className="nav-text-premium">Testimonials</span>
-              {activeSection === 'testimonials' && <div className="nav-active-dot"></div>}
-            </a>
-          </nav>
-        </div>
-
-        <div className="mobile-footer-premium">
-          <div className="footer-divider"></div>
-          <div className="action-buttons-premium">
+          <div className="mobile-welcome-text">
             {user ? (
-              <Link to="/dashboard" className="action-btn-premium dashboard-btn" onClick={() => setMobileMenuOpen(false)}>
-                <FaHeart /> <span>Dashboard</span> <FaArrowRight className="btn-arrow" />
-              </Link>
+              <>
+                <span className="welcome-greeting">Welcome back,</span>
+                <span className="user-name">{getUserFirstName() || 'User'}!</span>
+              </>
             ) : (
               <>
-                <Link to="/login" className="action-btn-premium signin-btn" onClick={() => setMobileMenuOpen(false)}>
-                  <FaSignInAlt /> <span>Sign In</span>
-                </Link>
-                <Link to="/login" className="action-btn-premium getstarted-btn" onClick={() => setMobileMenuOpen(false)}>
-                  <FaGift /> <span>Get Started Free</span> <FaArrowRight className="btn-arrow" />
-                </Link>
+                <span className="welcome-greeting">Welcome to</span>
+                <span className="brand-name">Wed<span className="text-gold">Card</span> Pro</span>
               </>
             )}
           </div>
-          <div className="footer-branding">
-            <div className="branding-text">
-              <FaHeart className="branding-icon" />
-              <span>WedCard Pro</span>
-            </div>
-            <p className="version-text">v1.0.0</p>
-          </div>
+          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
+            <FaTimes />
+          </button>
+        </div>
+        
+        {/* Scrollable Navigation */}
+        <div className="mobile-nav-scrollable">
+          <nav className="mobile-nav">
+            <a onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>
+              <FaHeart /> Home
+            </a>
+            <a onClick={() => scrollToSection('features')} className={activeSection === 'features' ? 'active' : ''}>
+              <FaStar /> Features
+            </a>
+            <a onClick={() => scrollToSection('templates')} className={activeSection === 'templates' ? 'active' : ''}>
+              <FaImages /> Templates
+            </a>
+            <a onClick={() => scrollToSection('pricing')} className={activeSection === 'pricing' ? 'active' : ''}>
+              <FaRupeeSign /> Pricing
+            </a>
+            <a onClick={() => scrollToSection('testimonials')} className={activeSection === 'testimonials' ? 'active' : ''}>
+              <FaUsers /> Testimonials
+            </a>
+          </nav>
+        </div>
+        
+        <div className="mobile-sidebar-footer">
+          {user ? (
+            <Link to="/dashboard" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
+              <FaHeart /> Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="mobile-btn-outline" onClick={() => setMobileMenuOpen(false)}>
+                <FaSignInAlt /> Sign In
+              </Link>
+              <Link to="/login" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
+                Get Started <FaArrowRight />
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
@@ -367,23 +265,25 @@ const LandingPage = () => {
           </div>
           
           <div className="nav-menu">
-            <a onClick={() => scrollToSection('home')} className={`nav-link ${activeSection === 'home' ? 'active' : ''}`}>Home</a>
-            <a onClick={() => scrollToSection('features')} className={`nav-link ${activeSection === 'features' ? 'active' : ''}`}>Features</a>
-            <a onClick={() => scrollToSection('templates')} className={`nav-link ${activeSection === 'templates' ? 'active' : ''}`}>Templates</a>
-            <a onClick={() => scrollToSection('pricing')} className={`nav-link ${activeSection === 'pricing' ? 'active' : ''}`}>Pricing</a>
-            <a onClick={() => scrollToSection('testimonials')} className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`}>Testimonials</a>
+            <a className={`nav-link ${activeSection === 'home' ? 'active' : ''}`} onClick={() => scrollToSection('home')}>Home</a>
+            <a className={`nav-link ${activeSection === 'features' ? 'active' : ''}`} onClick={() => scrollToSection('features')}>Features</a>
+            <a className={`nav-link ${activeSection === 'templates' ? 'active' : ''}`} onClick={() => scrollToSection('templates')}>Templates</a>
+            <a className={`nav-link ${activeSection === 'pricing' ? 'active' : ''}`} onClick={() => scrollToSection('pricing')}>Pricing</a>
+            <a className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`} onClick={() => scrollToSection('testimonials')}>Testimonials</a>
           </div>
           
           <div className="nav-buttons desktop-only">
             {user ? (
               <Link to="/dashboard" className="btn-premium-glow">
-                <span>Dashboard</span> <FaArrowRight />
+                <span>Dashboard</span>
+                <FaArrowRight />
               </Link>
             ) : (
               <>
                 <Link to="/login" className="btn-outline-premium">Sign In</Link>
                 <Link to="/login" className="btn-premium-glow">
-                  <span>Get Started</span> <FaArrowRight />
+                  <span>Get Started</span>
+                  <FaArrowRight />
                 </Link>
               </>
             )}
@@ -482,7 +382,7 @@ const LandingPage = () => {
                   <img src={template.image} alt={template.name} />
                   <div className="template-overlay-premium">
                     <span className="template-price">{template.price}</span>
-                    <button className="btn-preview">Preview Template</button>
+                    <button className="btn-preview">Preview</button>
                   </div>
                   {template.rating >= 4.8 && <div className="template-badge">Trending</div>}
                 </div>
@@ -576,7 +476,7 @@ const LandingPage = () => {
             
             <div className="testimonials-slider-wrapper">
               <div className="testimonials-slider">
-                {getVisibleTestimonials().map((testimonial) => (
+                {getVisibleTestimonials().map((testimonial, index) => (
                   <div key={testimonial.id} className="testimonial-card">
                     <div className="testimonial-content">
                       <FaHeart className="quote-icon" />
@@ -665,19 +565,39 @@ const LandingPage = () => {
             </div>
             <div className="footer-links">
               <h4>Product</h4>
-              <ul><li>Features</li><li>Templates</li><li>Pricing</li><li>Demo</li></ul>
+              <ul>
+                <li>Features</li>
+                <li>Templates</li>
+                <li>Pricing</li>
+                <li>Demo</li>
+              </ul>
             </div>
             <div className="footer-links">
               <h4>Company</h4>
-              <ul><li>About Us</li><li>Blog</li><li>Careers</li><li>Contact</li></ul>
+              <ul>
+                <li>About Us</li>
+                <li>Blog</li>
+                <li>Careers</li>
+                <li>Contact</li>
+              </ul>
             </div>
             <div className="footer-links">
               <h4>Resources</h4>
-              <ul><li>Help Center</li><li>Wedding Guide</li><li>Webinars</li><li>Community</li></ul>
+              <ul>
+                <li>Help Center</li>
+                <li>Wedding Guide</li>
+                <li>Webinars</li>
+                <li>Community</li>
+              </ul>
             </div>
             <div className="footer-links">
               <h4>Legal</h4>
-              <ul><li>Terms of Service</li><li>Privacy Policy</li><li>Refund Policy</li><li>Security</li></ul>
+              <ul>
+                <li>Terms of Service</li>
+                <li>Privacy Policy</li>
+                <li>Refund Policy</li>
+                <li>Security</li>
+              </ul>
             </div>
           </div>
           <div className="footer-bottom">
@@ -685,7 +605,10 @@ const LandingPage = () => {
             <div className="payment-methods">
               <span>Secure payments by</span>
               <div className="payment-icons">
-                <FaCcVisa /><FaCcMastercard /><FaCcPaypal /><FaRupeeSign />
+                <FaCcVisa />
+                <FaCcMastercard />
+                <FaCcPaypal />
+                <FaRupeeSign />
               </div>
             </div>
           </div>
