@@ -12,26 +12,10 @@ import {
   FaGlobe, FaPoll, FaCcVisa, FaCcMastercard, FaCcPaypal, FaRupeeSign,
   FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt, FaTimesCircle
 } from 'react-icons/fa';
-// Import all template components (using default exports)
-import ClassicTemplate from '../templates/ClassicTemplate';
-import ModernTemplate from '../templates/ModernTemplate';
-import LuxuryTemplate from '../templates/LuxuryTemplate';
-import TraditionalTemplate from '../templates/TraditionalTemplate';
-import BeachTemplate from '../templates/BeachTemplate';
-import GardenTemplate from '../templates/GardenTemplate';
+import { templatesRegistry } from '../templates/templatesRegistry';
 import '../styles/globals.css';
 import '../styles/animations.css';
 import '../styles/LandingPage.css';
-
-// Map template names (as used in your templates array) to components
-const templateComponentMap = {
-  'Royal Maharaja': LuxuryTemplate,
-  'Modern Romance': ModernTemplate,
-  'Golden Era': ClassicTemplate,      // using ClassicTemplate for Golden Era
-  'Beach Paradise': BeachTemplate,
-  'Garden Elegance': GardenTemplate,
-  'Divine Blessings': TraditionalTemplate,
-};
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -41,7 +25,6 @@ const LandingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
-  // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
@@ -57,25 +40,15 @@ const LandingPage = () => {
   const itemsPerPage = 3;
   const totalSlides = Math.ceil(testimonials.length / itemsPerPage);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
-
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
   const getVisibleTestimonials = () => {
     const start = currentSlide * itemsPerPage;
     return testimonials.slice(start, start + itemsPerPage);
   };
 
-  const getUserFirstName = () => {
-    if (!user?.name) return null;
-    return user.name.split(' ')[0];
-  };
+  const getUserFirstName = () => user?.name ? user.name.split(' ')[0] : null;
 
-  // Lock body scroll when modal or sidebar is open
   useEffect(() => {
     if (mobileMenuOpen || modalOpen) {
       document.body.style.overflow = 'hidden';
@@ -93,7 +66,6 @@ const LandingPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      
       const sections = ['home', 'features', 'templates', 'pricing', 'testimonials'];
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -105,16 +77,13 @@ const LandingPage = () => {
           }
         }
       }
-      
       const fadeElements = document.querySelectorAll('.fade-on-scroll');
       fadeElements.forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight - 100) {
+        if (el.getBoundingClientRect().top < window.innerHeight - 100) {
           el.classList.add('visible');
         }
       });
     };
-    
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
@@ -128,15 +97,9 @@ const LandingPage = () => {
     }
   };
 
-  // Handle template preview
-  const openTemplatePreview = (templateName) => {
-    const TemplateComponent = templateComponentMap[templateName];
-    if (TemplateComponent) {
-      setSelectedTemplate({ name: templateName, component: TemplateComponent });
-      setModalOpen(true);
-    } else {
-      console.warn(`Template component for "${templateName}" not found`);
-    }
+  const openTemplatePreview = (template) => {
+    setSelectedTemplate(template);
+    setModalOpen(true);
   };
 
   const closeModal = () => {
@@ -144,7 +107,7 @@ const LandingPage = () => {
     setSelectedTemplate(null);
   };
 
-  // Default demo data for template preview
+  // Demo data passed to every template in the modal
   const demoInvitationData = {
     coupleNames: "Raj & Simran",
     weddingDate: "December 25, 2025",
@@ -172,19 +135,6 @@ const LandingPage = () => {
     { icon: FaPaintBrush, title: 'Custom Templates', description: 'Drag-drop editor', color: '#FF69B4', tag: '' },
     { icon: FaRocket, title: 'Fast Delivery', description: '99.9% uptime SLA', color: '#E74C3C', tag: '' }
   ];
-
-  const templates = [
-    { name: 'Royal Maharaja', style: 'Luxury Heritage', price: 'Premium', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400', rating: 5, category: 'luxury' },
-    { name: 'Modern Romance', style: 'Contemporary', price: 'Free', image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400', rating: 4.8, category: 'modern' },
-    { name: 'Golden Era', style: 'Vintage Luxury', price: 'Premium', image: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400', rating: 4.9, category: 'vintage' },
-    { name: 'Beach Paradise', style: 'Destination', price: 'Free', image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400', rating: 4.8, category: 'destination' },
-    { name: 'Garden Elegance', style: 'Floral', price: 'Premium', image: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400', rating: 4.9, category: 'floral' },
-    { name: 'Divine Blessings', style: 'Spiritual', price: 'Premium', image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400', rating: 4.7, category: 'spiritual' }
-  ];
-
-  const filteredTemplates = activeFilter === 'all' 
-    ? templates 
-    : templates.filter(t => t.category === activeFilter);
 
   const plans = [
     {
@@ -228,6 +178,10 @@ const LandingPage = () => {
     { number: '150+', label: 'Cities', icon: FaGlobe }
   ];
 
+  const filteredTemplates = activeFilter === 'all' 
+    ? templatesRegistry 
+    : templatesRegistry.filter(t => t.category === activeFilter);
+
   return (
     <div className="landing-page-premium">
       {/* Animated Background */}
@@ -260,13 +214,11 @@ const LandingPage = () => {
         </div>
       )}
 
-      {/* Mobile Sidebar (unchanged) */}
+      {/* Mobile Sidebar */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-sidebar-header">
-          <div className="mobile-user-avatar-large">
-            <FaUser />
-          </div>
+          <div className="mobile-user-avatar-large"><FaUser /></div>
           <div className="mobile-welcome-text">
             {user ? (
               <>
@@ -280,60 +232,37 @@ const LandingPage = () => {
               </>
             )}
           </div>
-          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}>
-            <FaTimes />
-          </button>
+          <button className="mobile-close-btn" onClick={() => setMobileMenuOpen(false)}><FaTimes /></button>
         </div>
-        
         <div className="mobile-nav-scrollable">
           <nav className="mobile-nav">
-            <a onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>
-              <FaHeart /> Home
-            </a>
-            <a onClick={() => scrollToSection('features')} className={activeSection === 'features' ? 'active' : ''}>
-              <FaStar /> Features
-            </a>
-            <a onClick={() => scrollToSection('templates')} className={activeSection === 'templates' ? 'active' : ''}>
-              <FaImages /> Templates
-            </a>
-            <a onClick={() => scrollToSection('pricing')} className={activeSection === 'pricing' ? 'active' : ''}>
-              <FaRupeeSign /> Pricing
-            </a>
-            <a onClick={() => scrollToSection('testimonials')} className={activeSection === 'testimonials' ? 'active' : ''}>
-              <FaUsers /> Testimonials
-            </a>
+            <a onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}><FaHeart /> Home</a>
+            <a onClick={() => scrollToSection('features')} className={activeSection === 'features' ? 'active' : ''}><FaStar /> Features</a>
+            <a onClick={() => scrollToSection('templates')} className={activeSection === 'templates' ? 'active' : ''}><FaImages /> Templates</a>
+            <a onClick={() => scrollToSection('pricing')} className={activeSection === 'pricing' ? 'active' : ''}><FaRupeeSign /> Pricing</a>
+            <a onClick={() => scrollToSection('testimonials')} className={activeSection === 'testimonials' ? 'active' : ''}><FaUsers /> Testimonials</a>
           </nav>
         </div>
-        
         <div className="mobile-sidebar-footer">
           {user ? (
-            <Link to="/dashboard" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
-              <FaHeart /> Dashboard
-            </Link>
+            <Link to="/dashboard" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}><FaHeart /> Dashboard</Link>
           ) : (
             <>
-              <Link to="/login" className="mobile-btn-outline" onClick={() => setMobileMenuOpen(false)}>
-                <FaSignInAlt /> Sign In
-              </Link>
-              <Link to="/login" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>
-                Get Started <FaArrowRight />
-              </Link>
+              <Link to="/login" className="mobile-btn-outline" onClick={() => setMobileMenuOpen(false)}><FaSignInAlt /> Sign In</Link>
+              <Link to="/login" className="mobile-btn-primary" onClick={() => setMobileMenuOpen(false)}>Get Started <FaArrowRight /></Link>
             </>
           )}
         </div>
       </div>
 
-      {/* Desktop Navigation (unchanged) */}
+      {/* Desktop Navigation */}
       <nav className={`premium-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-logo">
-            <div className="logo-glow">
-              <FaHeart className="logo-icon" />
-            </div>
+            <div className="logo-glow"><FaHeart className="logo-icon" /></div>
             <span className="logo-text">Wed<span className="text-gold">Card</span> Pro</span>
             <span className="logo-badge">Premium</span>
           </div>
-          
           <div className="nav-menu">
             <a className={`nav-link ${activeSection === 'home' ? 'active' : ''}`} onClick={() => scrollToSection('home')}>Home</a>
             <a className={`nav-link ${activeSection === 'features' ? 'active' : ''}`} onClick={() => scrollToSection('features')}>Features</a>
@@ -341,46 +270,26 @@ const LandingPage = () => {
             <a className={`nav-link ${activeSection === 'pricing' ? 'active' : ''}`} onClick={() => scrollToSection('pricing')}>Pricing</a>
             <a className={`nav-link ${activeSection === 'testimonials' ? 'active' : ''}`} onClick={() => scrollToSection('testimonials')}>Testimonials</a>
           </div>
-          
           <div className="nav-buttons desktop-only">
             {user ? (
-              <Link to="/dashboard" className="btn-premium-glow">
-                <span>Dashboard</span>
-                <FaArrowRight />
-              </Link>
+              <Link to="/dashboard" className="btn-premium-glow"><span>Dashboard</span><FaArrowRight /></Link>
             ) : (
               <>
                 <Link to="/login" className="btn-outline-premium">Sign In</Link>
-                <Link to="/login" className="btn-premium-glow">
-                  <span>Get Started</span>
-                  <FaArrowRight />
-                </Link>
+                <Link to="/login" className="btn-premium-glow"><span>Get Started</span><FaArrowRight /></Link>
               </>
             )}
           </div>
-          
-          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}>
-            <FaBars />
-          </button>
+          <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(true)}><FaBars /></button>
         </div>
       </nav>
 
-      {/* Hero Section (unchanged) */}
+      {/* Hero Section */}
       <section id="home" className="premium-hero">
         <div className="hero-container">
-          <div className="hero-badge animate-pulse-glow">
-            <FaStar /> India's #1 Wedding Tech Platform 2025
-          </div>
-          <h1 className="hero-title">
-            Create Stunning
-            <span className="gradient-text-gold"> Digital Wedding</span>
-            <span> Invitations</span>
-          </h1>
-          <p className="hero-subtitle">
-            Join 50,000+ happy couples who transformed their wedding experience with 
-            India's most advanced digital invitation platform.
-          </p>
-          
+          <div className="hero-badge animate-pulse-glow"><FaStar /> India's #1 Wedding Tech Platform 2025</div>
+          <h1 className="hero-title">Create Stunning<span className="gradient-text-gold"> Digital Wedding</span><span> Invitations</span></h1>
+          <p className="hero-subtitle">Join 50,000+ happy couples who transformed their wedding experience with India's most advanced digital invitation platform.</p>
           <div className="hero-stats-grid">
             {stats.map((stat, index) => (
               <div key={index} className="hero-stat-item">
@@ -390,16 +299,10 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
-          
           <div className="hero-buttons">
-            <Link to={user ? "/dashboard" : "/login"} className="btn-hero-primary">
-              Start Free Trial <FaArrowRight />
-            </Link>
-            <button className="btn-hero-secondary">
-              <FaPlay /> Watch Demo
-            </button>
+            <Link to={user ? "/dashboard" : "/login"} className="btn-hero-primary">Start Free Trial <FaArrowRight /></Link>
+            <button className="btn-hero-secondary"><FaPlay /> Watch Demo</button>
           </div>
-          
           <div className="hero-trust-badges">
             <span><FaCheckCircle /> No credit card</span>
             <span><FaCheckCircle /> Free 14-day trial</span>
@@ -408,7 +311,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section (unchanged) */}
+      {/* Features Section */}
       <section id="features" className="premium-features fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -419,9 +322,7 @@ const LandingPage = () => {
           <div className="features-grid-premium">
             {features.map((feature, index) => (
               <div key={index} className="feature-card-premium" style={{ '--feature-color': feature.color }}>
-                <div className="feature-icon-premium">
-                  <feature.icon />
-                </div>
+                <div className="feature-icon-premium"><feature.icon /></div>
                 <h3>{feature.title}</h3>
                 <p>{feature.description}</p>
                 {feature.tag && <span className={`feature-tag ${feature.tag.toLowerCase()}`}>{feature.tag}</span>}
@@ -431,12 +332,12 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Templates Section - Updated Preview Button */}
+      {/* Templates Section – Dynamic from Registry */}
       <section id="templates" className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
             <span className="section-badge">Beautiful Designs</span>
-            <h2>Choose from <span className="gradient-text-gold">500+ Templates</span></h2>
+            <h2>Choose from <span className="gradient-text-gold">All Our Templates</span></h2>
             <p>Professionally designed templates for every wedding style</p>
           </div>
           <div className="templates-filter">
@@ -446,18 +347,13 @@ const LandingPage = () => {
             <button className={`filter-btn ${activeFilter === 'destination' ? 'active' : ''}`} onClick={() => setActiveFilter('destination')}>Destination</button>
           </div>
           <div className="templates-slider">
-            {filteredTemplates.map((template, index) => (
-              <div key={index} className="template-card-premium">
+            {filteredTemplates.map((template) => (
+              <div key={template.id} className="template-card-premium">
                 <div className="template-image-premium">
                   <img src={template.image} alt={template.name} />
                   <div className="template-overlay-premium">
                     <span className="template-price">{template.price}</span>
-                    <button 
-                      className="btn-preview"
-                      onClick={() => openTemplatePreview(template.name)}
-                    >
-                      Preview
-                    </button>
+                    <button className="btn-preview" onClick={() => openTemplatePreview(template)}>Preview</button>
                   </div>
                   {template.rating >= 4.8 && <div className="template-badge">Trending</div>}
                 </div>
@@ -477,7 +373,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section (unchanged) */}
+      {/* Pricing Section */}
       <section id="pricing" className="premium-pricing fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -485,25 +381,18 @@ const LandingPage = () => {
             <h2>Choose the Perfect <span className="gradient-text-gold">Plan for You</span></h2>
             <p>No hidden fees. Cancel anytime.</p>
           </div>
-          
           <div className="billing-toggle">
             <button className={billingCycle === 'monthly' ? 'active' : ''} onClick={() => setBillingCycle('monthly')}>Monthly</button>
-            <button className={billingCycle === 'yearly' ? 'active' : ''} onClick={() => setBillingCycle('yearly')}>
-              Yearly <span className="save-badge">Save 20%</span>
-            </button>
+            <button className={billingCycle === 'yearly' ? 'active' : ''} onClick={() => setBillingCycle('yearly')}>Yearly <span className="save-badge">Save 20%</span></button>
           </div>
-          
           <div className="pricing-grid-premium">
             {plans.map((plan, index) => {
               const currentPrice = billingCycle === 'monthly' ? plan.monthlyPrice : plan.yearlyPrice;
               const currentPeriod = billingCycle === 'monthly' ? 'month' : 'year';
-              
               return (
                 <div key={index} className={`pricing-card-premium ${plan.recommended ? 'recommended' : ''}`}>
                   {plan.recommended && <div className="recommended-badge">Most Popular</div>}
-                  <div className="plan-icon" style={{ color: plan.color }}>
-                    <plan.icon />
-                  </div>
+                  <div className="plan-icon" style={{ color: plan.color }}><plan.icon /></div>
                   <h3 className="plan-name">{plan.name}</h3>
                   <div className="plan-price">
                     {currentPrice === 0 ? (
@@ -518,10 +407,7 @@ const LandingPage = () => {
                   </div>
                   <ul className="plan-features-premium">
                     {plan.features.map((feature, i) => (
-                      <li key={i}>
-                        <FaCheckCircle className="check-icon" />
-                        <span>{feature}</span>
-                      </li>
+                      <li key={i}><FaCheckCircle className="check-icon" /><span>{feature}</span></li>
                     ))}
                   </ul>
                   <Link to="/login" className={`plan-btn ${plan.recommended ? 'btn-premium-glow' : 'btn-outline-premium'}`}>
@@ -535,7 +421,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section (unchanged) */}
+      {/* Testimonials Slider */}
       <section id="testimonials" className="premium-testimonials fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -543,12 +429,8 @@ const LandingPage = () => {
             <h2>Trusted by <span className="gradient-text-gold">50,000+ Couples</span></h2>
             <p>Real experiences from real weddings across India</p>
           </div>
-          
           <div className="testimonials-slider-container">
-            <button className="slider-nav prev" onClick={prevSlide}>
-              <FaChevronLeft />
-            </button>
-            
+            <button className="slider-nav prev" onClick={prevSlide}><FaChevronLeft /></button>
             <div className="testimonials-slider-wrapper">
               <div className="testimonials-slider">
                 {getVisibleTestimonials().map((testimonial) => (
@@ -557,9 +439,7 @@ const LandingPage = () => {
                       <FaHeart className="quote-icon" />
                       <p>"{testimonial.text}"</p>
                       <div className="testimonial-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} className="star-filled" />
-                        ))}
+                        {[...Array(5)].map((_, i) => <FaStar key={i} className="star-filled" />)}
                       </div>
                     </div>
                     <div className="testimonial-author">
@@ -573,37 +453,25 @@ const LandingPage = () => {
                 ))}
               </div>
             </div>
-            
-            <button className="slider-nav next" onClick={nextSlide}>
-              <FaChevronRight />
-            </button>
+            <button className="slider-nav next" onClick={nextSlide}><FaChevronRight /></button>
           </div>
-          
           <div className="slider-dots">
             {[...Array(totalSlides)].map((_, index) => (
-              <button
-                key={index}
-                className={`slider-dot ${currentSlide === index ? 'active' : ''}`}
-                onClick={() => setCurrentSlide(index)}
-              />
+              <button key={index} className={`slider-dot ${currentSlide === index ? 'active' : ''}`} onClick={() => setCurrentSlide(index)} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section (unchanged) */}
+      {/* CTA Section */}
       <section className="premium-cta fade-on-scroll">
         <div className="cta-container">
           <div className="cta-content">
             <h2>Ready to Create Your Dream Wedding Invitation?</h2>
             <p>Join 50,000+ couples who transformed their wedding experience</p>
             <div className="cta-buttons">
-              <Link to={user ? "/dashboard" : "/login"} className="btn-cta-primary">
-                Start Free Trial <FaArrowRight />
-              </Link>
-              <button className="btn-cta-secondary">
-                <FaPlay /> Watch Demo
-              </button>
+              <Link to={user ? "/dashboard" : "/login"} className="btn-cta-primary">Start Free Trial <FaArrowRight /></Link>
+              <button className="btn-cta-secondary"><FaPlay /> Watch Demo</button>
             </div>
             <div className="cta-features">
               <span><FaCheckCircle /> No credit card</span>
@@ -614,15 +482,12 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer (unchanged) */}
+      {/* Footer */}
       <footer className="premium-footer">
         <div className="container">
           <div className="footer-grid-premium">
             <div className="footer-brand">
-              <div className="footer-logo">
-                <FaHeart className="logo-icon" />
-                <span>Wed<span className="text-gold">Card</span> Pro</span>
-              </div>
+              <div className="footer-logo"><FaHeart className="logo-icon" /><span>Wed<span className="text-gold">Card</span> Pro</span></div>
               <p>India's most advanced digital wedding invitation platform.</p>
               <div className="app-badges">
                 <span>Download App</span>
@@ -632,60 +497,17 @@ const LandingPage = () => {
                 </div>
               </div>
               <div className="social-links">
-                <a href="#"><FaInstagram /></a>
-                <a href="#"><FaFacebook /></a>
-                <a href="#"><FaTwitter /></a>
-                <a href="#"><FaLinkedin /></a>
+                <a href="#"><FaInstagram /></a><a href="#"><FaFacebook /></a><a href="#"><FaTwitter /></a><a href="#"><FaLinkedin /></a>
               </div>
             </div>
-            <div className="footer-links">
-              <h4>Product</h4>
-              <ul>
-                <li>Features</li>
-                <li>Templates</li>
-                <li>Pricing</li>
-                <li>Demo</li>
-              </ul>
-            </div>
-            <div className="footer-links">
-              <h4>Company</h4>
-              <ul>
-                <li>About Us</li>
-                <li>Blog</li>
-                <li>Careers</li>
-                <li>Contact</li>
-              </ul>
-            </div>
-            <div className="footer-links">
-              <h4>Resources</h4>
-              <ul>
-                <li>Help Center</li>
-                <li>Wedding Guide</li>
-                <li>Webinars</li>
-                <li>Community</li>
-              </ul>
-            </div>
-            <div className="footer-links">
-              <h4>Legal</h4>
-              <ul>
-                <li>Terms of Service</li>
-                <li>Privacy Policy</li>
-                <li>Refund Policy</li>
-                <li>Security</li>
-              </ul>
-            </div>
+            <div className="footer-links"><h4>Product</h4><ul><li>Features</li><li>Templates</li><li>Pricing</li><li>Demo</li></ul></div>
+            <div className="footer-links"><h4>Company</h4><ul><li>About Us</li><li>Blog</li><li>Careers</li><li>Contact</li></ul></div>
+            <div className="footer-links"><h4>Resources</h4><ul><li>Help Center</li><li>Wedding Guide</li><li>Webinars</li><li>Community</li></ul></div>
+            <div className="footer-links"><h4>Legal</h4><ul><li>Terms of Service</li><li>Privacy Policy</li><li>Refund Policy</li><li>Security</li></ul></div>
           </div>
           <div className="footer-bottom">
             <p>&copy; 2026 WedCard Pro. All rights reserved. Made with <FaHeart className="footer-heart" /> in India</p>
-            <div className="payment-methods">
-              <span>Secure payments by</span>
-              <div className="payment-icons">
-                <FaCcVisa />
-                <FaCcMastercard />
-                <FaCcPaypal />
-                <FaRupeeSign />
-              </div>
-            </div>
+            <div className="payment-methods"><span>Secure payments by</span><div className="payment-icons"><FaCcVisa /><FaCcMastercard /><FaCcPaypal /><FaRupeeSign /></div></div>
           </div>
         </div>
       </footer>

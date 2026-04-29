@@ -1,22 +1,35 @@
 import React from 'react';
-import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaLeaf } from 'react-icons/fa';
 
-const GardenTemplate = ({ data, colors }) => {
+const GardenTemplate = ({ data }) => {
+  const { coupleNames, weddingDate, venue, message, ceremonyTime } = data;
   return (
-    <div className="template-card garden" style={{ '--primary-color': colors.primary, '--secondary-color': colors.secondary }}>
-      <div className="garden-container">
-        <FaLeaf className="garden-leaf" />
-        <h2 className="garden-subtitle">You are cordially invited</h2>
-        <h1 className="garden-title">{data.couple.bride} <span className="garden-amp">&</span> {data.couple.groom}</h1>
-        
-        <div className="garden-details">
-          <p><FaCalendarAlt /> {data.eventDate ? new Date(data.eventDate).toLocaleDateString() : 'Date TBA'}</p>
-          <p><FaClock /> {data.eventTime || 'Time TBA'}</p>
-          <p><FaMapMarkerAlt /> {data.venue?.name || 'Venue TBA'}</p>
-        </div>
-        
-        <p className="garden-message">{data.description || 'Please join us for a garden ceremony and reception'}</p>
-        <p className="garden-rsvp">Kindly RSVP by {data.rsvpDeadline || 'date TBA'}</p>
+    <div style={{
+      maxWidth: '600px',
+      margin: '0 auto',
+      background: '#f0f7e8',
+      borderRadius: '28px',
+      overflow: 'hidden',
+      boxShadow: '0 12px 28px rgba(0,0,0,0.1)',
+      fontFamily: "'Nunito', sans-serif",
+      border: '1px solid #b0c47a'
+    }}>
+      <div style={{ background: '#5a7d3c', padding: '1rem', textAlign: 'center', color: 'white' }}>
+        <h3>Garden Wedding</h3>
+      </div>
+      <div style={{ padding: '1.8rem', textAlign: 'center' }}>
+        <h2>{coupleNames}</h2>
+        <p>🌸 {message} 🌸</p>
+        <p>🗓️ {weddingDate}</p>
+        <p>📍 {venue}</p>
+        <p>⏰ {ceremonyTime}</p>
+        <button style={{
+          background: '#5a7d3c',
+          color: 'white',
+          border: 'none',
+          padding: '0.6rem 1.5rem',
+          borderRadius: '50px',
+          cursor: 'pointer'
+        }}>Coming with Joy</button>
       </div>
     </div>
   );

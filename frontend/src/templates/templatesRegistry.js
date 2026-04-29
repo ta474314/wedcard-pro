@@ -1,94 +1,78 @@
-// This file will register all available templates
 import ClassicTemplate from './ClassicTemplate';
 import ModernTemplate from './ModernTemplate';
+import LuxuryTemplate from './LuxuryTemplate';
 import TraditionalTemplate from './TraditionalTemplate';
 import BeachTemplate from './BeachTemplate';
 import GardenTemplate from './GardenTemplate';
-import LuxuryTemplate from './LuxuryTemplate';
 
-// Define all templates with metadata
-export const templatesData = [
+const thumbnails = {
+  classic: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
+  modern: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
+  luxury: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400',
+  traditional: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
+  beach: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
+  garden: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400',
+};
+
+export const templatesRegistry = [
   {
-    id: 'classic',
-    name: 'Classic Elegance',
-    style: 'Traditional & Timeless',
-    price: 'Free',
-    rating: 4.8,
-    category: 'classic',
-    component: ClassicTemplate,
-    description: 'A timeless design perfect for formal weddings',
-    previewImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
-    features: ['Printable', 'Customizable colors', 'RSVP integration']
-  },
-  {
-    id: 'modern',
-    name: 'Modern Romance',
-    style: 'Contemporary & Minimal',
-    price: 'Free',
-    rating: 4.8,
-    category: 'modern',
-    component: ModernTemplate,
-    description: 'Clean lines and contemporary style for modern couples',
-    previewImage: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
-    features: ['Digital first', 'QR code ready', 'Mobile optimized']
-  },
-  {
-    id: 'traditional',
-    name: 'Golden Era',
-    style: 'Vintage Luxury',
-    price: 'Premium',
-    rating: 4.9,
-    category: 'traditional',
-    component: TraditionalTemplate,
-    description: 'Rich cultural elements with golden accents',
-    previewImage: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400',
-    features: ['Golden theme', 'Traditional motifs', 'Luxury finish']
-  },
-  {
-    id: 'beach',
-    name: 'Beach Paradise',
-    style: 'Destination & Tropical',
-    price: 'Free',
-    rating: 4.8,
-    category: 'destination',
-    component: BeachTemplate,
-    description: 'Perfect for beach and destination weddings',
-    previewImage: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400',
-    features: ['Tropical theme', 'Sunset colors', 'Destination ready']
-  },
-  {
-    id: 'garden',
-    name: 'Garden Elegance',
-    style: 'Floral & Nature',
-    price: 'Premium',
-    rating: 4.9,
-    category: 'floral',
-    component: GardenTemplate,
-    description: 'Fresh and natural garden party theme',
-    previewImage: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=400',
-    features: ['Floral design', 'Nature inspired', 'Elegant layout']
-  },
-  {
-    id: 'luxury',
+    id: 1,
     name: 'Royal Maharaja',
+    component: LuxuryTemplate,
+    category: 'luxury',
     style: 'Luxury Heritage',
     price: 'Premium',
     rating: 5.0,
-    category: 'luxury',
-    component: LuxuryTemplate,
-    description: 'Premium design with royal aesthetic',
-    previewImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400',
-    features: ['Royal theme', 'Gold accents', 'Premium finish']
-  }
+    image: thumbnails.luxury,
+  },
+  {
+    id: 2,
+    name: 'Modern Romance',
+    component: ModernTemplate,
+    category: 'modern',
+    style: 'Contemporary',
+    price: 'Free',
+    rating: 4.8,
+    image: thumbnails.modern,
+  },
+  {
+    id: 3,
+    name: 'Golden Era',
+    component: ClassicTemplate,
+    category: 'vintage',
+    style: 'Vintage Luxury',
+    price: 'Premium',
+    rating: 4.9,
+    image: thumbnails.classic,
+  },
+  {
+    id: 4,
+    name: 'Beach Paradise',
+    component: BeachTemplate,
+    category: 'destination',
+    style: 'Destination',
+    price: 'Free',
+    rating: 4.8,
+    image: thumbnails.beach,
+  },
+  {
+    id: 5,
+    name: 'Garden Elegance',
+    component: GardenTemplate,
+    category: 'floral',
+    style: 'Floral',
+    price: 'Premium',
+    rating: 4.9,
+    image: thumbnails.garden,
+  },
+  {
+    id: 6,
+    name: 'Divine Blessings',
+    component: TraditionalTemplate,
+    category: 'spiritual',
+    style: 'Spiritual',
+    price: 'Premium',
+    rating: 4.7,
+    image: thumbnails.traditional,
+  },
 ];
-
-// Get template by ID
-export const getTemplateById = (id) => {
-  return templatesData.find(template => template.id === id);
-};
-
-// Get templates by category
-export const getTemplatesByCategory = (category) => {
-  if (category === 'all') return templatesData;
-  return templatesData.filter(template => template.category === category);
-};

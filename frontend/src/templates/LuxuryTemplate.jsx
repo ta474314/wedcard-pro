@@ -1,37 +1,49 @@
 import React from 'react';
-import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaCrown } from 'react-icons/fa';
 
-const LuxuryTemplate = ({ data, colors }) => {
+const LuxuryTemplate = ({ data }) => {
+  const { coupleNames, weddingDate, venue, message, ceremonyTime } = data;
   return (
-    <div className="template-card luxury" style={{ '--primary-color': colors.primary, '--secondary-color': colors.secondary }}>
-      <div className="luxury-container">
-        <FaCrown className="luxury-crown" />
-        <div className="luxury-border">
-          <h2 className="luxury-subtitle">The Wedding of</h2>
-          <h1 className="luxury-title">{data.couple.bride}<br/><span className="luxury-amp">&</span><br/>{data.couple.groom}</h1>
-          
-          <div className="luxury-details">
-            <div className="luxury-detail">
-              <FaCalendarAlt />
-              <span>{data.eventDate ? new Date(data.eventDate).toLocaleDateString() : 'Date TBA'}</span>
-            </div>
-            <div className="luxury-detail">
-              <FaClock />
-              <span>{data.eventTime || 'Time TBA'}</span>
-            </div>
-            <div className="luxury-detail">
-              <FaMapMarkerAlt />
-              <span>{data.venue?.name || 'Venue TBA'}</span>
-            </div>
-          </div>
-          
-          <p className="luxury-message">{data.description || 'The honor of your presence is requested'}</p>
-          
-          <div className="luxury-footer">
-            <p>Black Tie Optional</p>
-            <p>Reception to follow</p>
-          </div>
+    <div style={{
+      maxWidth: '600px',
+      margin: '0 auto',
+      background: '#fef7e0',
+      borderRadius: '16px',
+      overflow: 'hidden',
+      boxShadow: '0 25px 45px rgba(0,0,0,0.2)',
+      fontFamily: "'Playfair Display', serif"
+    }}>
+      <div style={{
+        background: 'url("https://images.unsplash.com/photo-1519741497674-611481863552?w=600") center/cover',
+        height: '200px',
+        position: 'relative'
+      }}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <h1 style={{ color: 'gold', fontSize: '2rem', textShadow: '2px 2px 4px black' }}>{coupleNames}</h1>
         </div>
+      </div>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p style={{ fontSize: '1.1rem' }}>{message}</p>
+        <div style={{ borderTop: '1px solid #d4af37', borderBottom: '1px solid #d4af37', padding: '1rem 0', margin: '1rem 0' }}>
+          <p>📅 {weddingDate}</p>
+          <p>📍 {venue}</p>
+          <p>⏰ {ceremonyTime}</p>
+        </div>
+        <button style={{
+          background: '#b8860b',
+          color: 'white',
+          border: 'none',
+          padding: '0.8rem 1.8rem',
+          borderRadius: '30px',
+          fontWeight: 'bold',
+          cursor: 'pointer'
+        }}>Join Celebration</button>
       </div>
     </div>
   );

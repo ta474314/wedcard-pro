@@ -1,28 +1,34 @@
 import React from 'react';
-import { FaHeart, FaCalendarAlt, FaMapMarkerAlt, FaClock, FaOm } from 'react-icons/fa';
 
-const TraditionalTemplate = ({ data, colors }) => {
+const TraditionalTemplate = ({ data }) => {
+  const { coupleNames, weddingDate, venue, message, ceremonyTime } = data;
   return (
-    <div className="template-card traditional" style={{ '--primary-color': colors.primary, '--secondary-color': colors.secondary }}>
-      <div className="traditional-container">
-        <FaOm className="traditional-om" />
-        <div className="traditional-border">
-          <h2 className="traditional-subtitle">शुभ विवाह</h2>
-          <h1 className="traditional-title">{data.couple.bride} <FaHeart className="traditional-heart" /> {data.couple.groom}</h1>
-          <p className="traditional-line">request the pleasure of your company</p>
-          
-          <div className="traditional-details">
-            <p><FaCalendarAlt /> {data.eventDate ? new Date(data.eventDate).toLocaleDateString() : 'Date TBA'}</p>
-            <p><FaClock /> {data.eventTime || 'Time TBA'}</p>
-            <p><FaMapMarkerAlt /> {data.venue?.name || 'Venue TBA'}</p>
-          </div>
-          
-          <p className="traditional-message">{data.description || 'Join us as we celebrate our union with family and friends.'}</p>
-          
-          <div className="traditional-footer">
-            <p>Blessings and best wishes</p>
-          </div>
-        </div>
+    <div style={{
+      maxWidth: '600px',
+      margin: '0 auto',
+      background: '#fdf4e3',
+      borderRadius: '16px',
+      overflow: 'hidden',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+      fontFamily: "'Times New Roman', serif",
+      border: '1px solid #e2c8a2'
+    }}>
+      <div style={{ background: '#8b0000', padding: '1rem', textAlign: 'center', color: 'goldenrod' }}>
+        <h2>शादी का निमंत्रण</h2>
+      </div>
+      <div style={{ padding: '1.5rem', textAlign: 'center' }}>
+        <h3>{coupleNames}</h3>
+        <p>{message}</p>
+        <p><strong>मुहूर्त:</strong> {weddingDate}, {ceremonyTime}</p>
+        <p><strong>स्थान:</strong> {venue}</p>
+        <button style={{
+          background: '#8b0000',
+          color: 'white',
+          border: 'none',
+          padding: '0.5rem 1.5rem',
+          borderRadius: '8px',
+          cursor: 'pointer'
+        }}>सादर आमंत्रण</button>
       </div>
     </div>
   );

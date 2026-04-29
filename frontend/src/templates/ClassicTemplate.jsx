@@ -1,43 +1,40 @@
 import React from 'react';
-import { FaHeart, FaCalendarAlt, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 
-const ClassicTemplate = ({ data, colors }) => {
+const ClassicTemplate = ({ data }) => {
+  const { coupleNames, weddingDate, venue, message, ceremonyTime } = data;
   return (
-    <div className="template-card classic" style={{ '--primary-color': colors.primary, '--secondary-color': colors.secondary }}>
-      <div className="template-border">
-        <div className="template-header">
-          <FaHeart className="template-icon" />
-          <h2 className="template-tagline">Together with their families</h2>
-        </div>
-        
-        <div className="template-content">
-          <h1 className="template-title">{data.title || `${data.couple.bride} & ${data.couple.groom}`}</h1>
-          <h3 className="template-subtitle">request the honor of your presence</h3>
-          
-          <div className="template-details">
-            <div className="detail-item">
-              <FaCalendarAlt />
-              <span>{data.eventDate ? new Date(data.eventDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Date TBA'}</span>
-            </div>
-            <div className="detail-item">
-              <FaClock />
-              <span>{data.eventTime || 'Time TBA'}</span>
-            </div>
-            <div className="detail-item">
-              <FaMapMarkerAlt />
-              <span>{data.venue?.name || 'Venue TBA'}, {data.venue?.city || ''}</span>
-            </div>
-          </div>
-          
-          <p className="template-message">{data.description || 'Join us as we celebrate our love and begin our journey together.'}</p>
-          
-          <div className="template-footer">
-            <p>Reception to follow</p>
-            <p className="template-rsvp">RSVP by {data.rsvpDeadline || 'date TBA'}</p>
-          </div>
-        </div>
-        
-        <div className="template-border-bottom"></div>
+    <div style={{
+      maxWidth: '600px',
+      margin: '0 auto',
+      background: '#fff8f0',
+      borderRadius: '20px',
+      overflow: 'hidden',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+      fontFamily: "'Georgia', serif"
+    }}>
+      <div style={{
+        background: 'linear-gradient(135deg, #b8860b, #daa520)',
+        padding: '2rem',
+        textAlign: 'center',
+        color: 'white'
+      }}>
+        <h1 style={{ fontSize: '2rem', margin: 0 }}>{coupleNames}</h1>
+        <p style={{ fontStyle: 'italic', marginTop: '0.5rem' }}>Request the honour of your presence</p>
+      </div>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p>{message}</p>
+        <p><strong>Date:</strong> {weddingDate}</p>
+        <p><strong>Venue:</strong> {venue}</p>
+        <p><strong>Ceremony:</strong> {ceremonyTime}</p>
+        <button style={{
+          background: '#b8860b',
+          color: 'white',
+          border: 'none',
+          padding: '0.75rem 1.5rem',
+          borderRadius: '40px',
+          marginTop: '1rem',
+          cursor: 'pointer'
+        }}>RSVP Now</button>
       </div>
     </div>
   );

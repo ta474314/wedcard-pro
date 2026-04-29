@@ -1,27 +1,37 @@
 import React from 'react';
-import { FaCalendarAlt, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
 
-const ModernTemplate = ({ data, colors }) => {
+const ModernTemplate = ({ data }) => {
+  const { coupleNames, weddingDate, venue, message, ceremonyTime } = data;
   return (
-    <div className="template-card modern" style={{ '--primary-color': colors.primary, '--secondary-color': colors.secondary }}>
-      <div className="modern-container">
-        <div className="modern-left">
-          <div className="modern-initials">
-            {data.couple.bride?.charAt(0)}{data.couple.groom?.charAt(0)}
-          </div>
+    <div style={{
+      maxWidth: '600px',
+      margin: '0 auto',
+      background: '#fafafa',
+      borderRadius: '24px',
+      overflow: 'hidden',
+      boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+      fontFamily: "'Poppins', sans-serif"
+    }}>
+      <div style={{ background: '#2c3e50', padding: '1.5rem', textAlign: 'center', color: 'white' }}>
+        <h2 style={{ margin: 0, fontWeight: 600 }}>WE'RE GETTING MARRIED</h2>
+      </div>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h3 style={{ fontSize: '1.8rem', color: '#e67e22' }}>{coupleNames}</h3>
+        <p style={{ color: '#7f8c8d' }}>{message}</p>
+        <div style={{ margin: '1.5rem 0' }}>
+          <p>📅 {weddingDate}</p>
+          <p>📍 {venue}</p>
+          <p>⏰ {ceremonyTime}</p>
         </div>
-        <div className="modern-right">
-          <h1 className="modern-title">{data.couple.bride} <span className="modern-amp">&</span> {data.couple.groom}</h1>
-          <p className="modern-invite">invite you to celebrate their wedding</p>
-          
-          <div className="modern-details">
-            <div><FaCalendarAlt /> {data.eventDate ? new Date(data.eventDate).toLocaleDateString() : 'Date TBA'}</div>
-            <div><FaClock /> {data.eventTime || 'Time TBA'}</div>
-            <div><FaMapMarkerAlt /> {data.venue?.name || 'Venue TBA'}</div>
-          </div>
-          
-          <p className="modern-message">{data.description || 'Your presence would mean the world to us as we begin this beautiful journey.'}</p>
-        </div>
+        <button style={{
+          background: '#e67e22',
+          border: 'none',
+          padding: '0.75rem 2rem',
+          borderRadius: '50px',
+          color: 'white',
+          fontWeight: 'bold',
+          cursor: 'pointer'
+        }}>Confirm Attendance</button>
       </div>
     </div>
   );
