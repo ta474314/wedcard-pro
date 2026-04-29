@@ -10,11 +10,28 @@ import {
   FaBars, FaTimes, FaVideo, FaHeadset,
   FaRobot, FaWhatsapp, FaApple, FaGoogle,
   FaGlobe, FaPoll, FaCcVisa, FaCcMastercard, FaCcPaypal, FaRupeeSign,
-  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt
+  FaChevronLeft, FaChevronRight, FaUser, FaSignInAlt, FaTimesCircle
 } from 'react-icons/fa';
+// Import all template components (using default exports)
+import ClassicTemplate from '../templates/ClassicTemplate';
+import ModernTemplate from '../templates/ModernTemplate';
+import LuxuryTemplate from '../templates/LuxuryTemplate';
+import TraditionalTemplate from '../templates/TraditionalTemplate';
+import BeachTemplate from '../templates/BeachTemplate';
+import GardenTemplate from '../templates/GardenTemplate';
 import '../styles/globals.css';
 import '../styles/animations.css';
 import '../styles/LandingPage.css';
+
+// Map template names (as used in your templates array) to components
+const templateComponentMap = {
+  'Royal Maharaja': LuxuryTemplate,
+  'Modern Romance': ModernTemplate,
+  'Golden Era': ClassicTemplate,      // using ClassicTemplate for Golden Era
+  'Beach Paradise': BeachTemplate,
+  'Garden Elegance': GardenTemplate,
+  'Divine Blessings': TraditionalTemplate,
+};
 
 const LandingPage = () => {
   const { user } = useAuth();
@@ -24,6 +41,9 @@ const LandingPage = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [activeFilter, setActiveFilter] = useState('all');
   const [currentSlide, setCurrentSlide] = useState(0);
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const testimonials = [
     { id: 1, name: 'Priya & Rajesh', wedding: 'Mumbai, Dec 2024', text: 'WedCard Pro made our wedding planning so easy! The QR code feature was a hit among guests.', rating: 5, image: 'https://randomuser.me/api/portraits/women/1.jpg', location: 'Mumbai' },
@@ -55,9 +75,9 @@ const LandingPage = () => {
     return user.name.split(' ')[0];
   };
 
-  // Lock/unlock body scroll when sidebar opens/closes
+  // Lock body scroll when modal or sidebar is open
   useEffect(() => {
-    if (mobileMenuOpen) {
+    if (mobileMenuOpen || modalOpen) {
       document.body.style.overflow = 'hidden';
       document.body.classList.add('sidebar-open');
     } else {
@@ -68,7 +88,7 @@ const LandingPage = () => {
       document.body.style.overflow = 'unset';
       document.body.classList.remove('sidebar-open');
     };
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, modalOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +126,36 @@ const LandingPage = () => {
       element.scrollIntoView({ behavior: 'smooth' });
       setMobileMenuOpen(false);
     }
+  };
+
+  // Handle template preview
+  const openTemplatePreview = (templateName) => {
+    const TemplateComponent = templateComponentMap[templateName];
+    if (TemplateComponent) {
+      setSelectedTemplate({ name: templateName, component: TemplateComponent });
+      setModalOpen(true);
+    } else {
+      console.warn(`Template component for "${templateName}" not found`);
+    }
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedTemplate(null);
+  };
+
+  // Default demo data for template preview
+  const demoInvitationData = {
+    coupleNames: "Raj & Simran",
+    weddingDate: "December 25, 2025",
+    venue: "The Grand Palace, Jaipur",
+    message: "Together with our families, we invite you to celebrate our wedding",
+    ceremonyTime: "7:00 PM onwards",
+    rsvpLink: "#",
+    galleryImages: ["https://via.placeholder.com/400", "https://via.placeholder.com/400"],
+    liveStreamLink: "https://example.com/live",
+    qrCodeUrl: "#",
+    whatsappNumber: "+91 1234567890"
   };
 
   const features = [
@@ -189,7 +239,28 @@ const LandingPage = () => {
         <div className="grid-pattern"></div>
       </div>
 
-      {/* Enhanced Mobile Sidebar */}
+      {/* Modal Preview */}
+      {modalOpen && selectedTemplate && (
+        <div className="template-modal-overlay" onClick={closeModal}>
+          <div className="template-modal-container" onClick={(e) => e.stopPropagation()}>
+            <button className="template-modal-close" onClick={closeModal}>
+              <FaTimesCircle />
+            </button>
+            <div className="template-modal-content">
+              <h2 className="template-modal-title">Preview: {selectedTemplate.name}</h2>
+              <div className="template-preview-wrapper">
+                <selectedTemplate.component data={demoInvitationData} />
+              </div>
+              <div className="template-modal-footer">
+                <button className="modal-close-btn" onClick={closeModal}>Close Preview</button>
+                <Link to="/login" className="modal-use-btn">Use This Template</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Sidebar (unchanged) */}
       <div className={`mobile-sidebar-overlay ${mobileMenuOpen ? 'active' : ''}`} onClick={() => setMobileMenuOpen(false)}></div>
       <div className={`mobile-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="mobile-sidebar-header">
@@ -214,7 +285,6 @@ const LandingPage = () => {
           </button>
         </div>
         
-        {/* Scrollable Navigation */}
         <div className="mobile-nav-scrollable">
           <nav className="mobile-nav">
             <a onClick={() => scrollToSection('home')} className={activeSection === 'home' ? 'active' : ''}>
@@ -361,7 +431,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Templates Section (unchanged) */}
+      {/* Templates Section - Updated Preview Button */}
       <section id="templates" className="premium-templates fade-on-scroll">
         <div className="container">
           <div className="section-header-premium">
@@ -382,7 +452,12 @@ const LandingPage = () => {
                   <img src={template.image} alt={template.name} />
                   <div className="template-overlay-premium">
                     <span className="template-price">{template.price}</span>
-                    <button className="btn-preview">Preview</button>
+                    <button 
+                      className="btn-preview"
+                      onClick={() => openTemplatePreview(template.name)}
+                    >
+                      Preview
+                    </button>
                   </div>
                   {template.rating >= 4.8 && <div className="template-badge">Trending</div>}
                 </div>
